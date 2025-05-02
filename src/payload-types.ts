@@ -6,23 +6,103 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
+/**
+ * Supported timezones in IANA format.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supportedTimezones".
+ */
+export type SupportedTimezones =
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Brisbane'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
+
 export interface Config {
   auth: {
     users: UserAuthOperations;
   };
+  blocks: {};
   collections: {
     users: User;
     media: Media;
+    categories: Category;
+    subcategories: Subcategory;
+    products: Product;
+    orders: Order;
+    testimonials: Testimonial;
+    'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
+  };
+  collectionsJoins: {};
+  collectionsSelect: {
+    users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    subcategories: SubcategoriesSelect<false> | SubcategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: string;
   };
   globals: {};
+  globalsSelect: {};
   locale: null;
   user: User & {
     collection: 'users';
+  };
+  jobs: {
+    tasks: unknown;
+    workflows: unknown;
   };
 }
 export interface UserAuthOperations {
@@ -81,6 +161,288 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  /**
+   * URL-friendly version of the name (e.g., "abaya", "qamis", "custom")
+   */
+  slug: string;
+  description?: string | null;
+  featured?: boolean | null;
+  /**
+   * Order to display the category (lower numbers appear first)
+   */
+  displayOrder?: number | null;
+  /**
+   * Main category image for display on homepage and collection pages
+   */
+  image: string | Media;
+  /**
+   * Optional larger banner image for category page headers
+   */
+  bannerImage?: (string | null) | Media;
+  /**
+   * Subcategories associated with this main category
+   */
+  subcategories?: (string | Subcategory)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subcategories".
+ */
+export interface Subcategory {
+  id: string;
+  name: string;
+  /**
+   * URL-friendly version of the name (e.g., "classic", "modern")
+   */
+  slug: string;
+  /**
+   * The main category this subcategory belongs to
+   */
+  category: string | Category;
+  description?: string | null;
+  /**
+   * Order to display the subcategory (lower numbers appear first)
+   */
+  displayOrder?: number | null;
+  /**
+   * Image for the subcategory
+   */
+  image?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  price: number;
+  category: string | Category;
+  /**
+   * Select a subcategory that belongs to the selected main category
+   */
+  subcategory?: (string | null) | Subcategory;
+  status: 'active' | 'draft' | 'out-of-stock';
+  featured?: boolean | null;
+  trending?: boolean | null;
+  sku: string;
+  mainImage: string | Media;
+  colorVariations?:
+    | {
+        color: string;
+        colorCode: string;
+        image: string | Media;
+        additionalImages?:
+          | {
+              image: string | Media;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  sizeVariations?:
+    | {
+        size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
+        measurements: {
+          chest: number;
+          shoulder: number;
+          sleeve: number;
+          length: number;
+          /**
+           * Required for specific product types like abaya
+           */
+          waist?: number | null;
+          /**
+           * Required for specific product types like abaya
+           */
+          hip?: number | null;
+        };
+        inStock?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  heightRanges?:
+    | {
+        min: number;
+        max: number;
+        /**
+         * E.g., "Short", "Regular", "Tall"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  allowCustomMeasurements?: boolean | null;
+  customMeasurementFields?:
+    | {
+        fieldName: string;
+        unit: 'cm' | 'in';
+        required?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  metadata?: {
+    material?: string | null;
+    careInstructions?: string | null;
+    tags?:
+      | {
+          tag?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  /**
+   * Unique order identifier
+   */
+  orderNumber: string;
+  customer: string | User;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  items: {
+    product: string | Product;
+    quantity: number;
+    color: string;
+    size: string;
+    height?: string | null;
+    /**
+     * Custom measurements provided by the customer
+     */
+    customMeasurements?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    price: number;
+    id?: string | null;
+  }[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  shippingAddress: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+  };
+  billingAddress?: {
+    sameAsShipping?: boolean | null;
+    fullName?: string | null;
+    addressLine1?: string | null;
+    addressLine2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+    phone?: string | null;
+  };
+  paymentMethod: 'credit-card' | 'bank-transfer' | 'cash-on-delivery';
+  paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: string;
+  customerName: string;
+  customerImage?: (string | null) | Media;
+  rating: '5' | '4' | '3' | '2' | '1';
+  text: string;
+  active?: boolean | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents".
+ */
+export interface PayloadLockedDocument {
+  id: string;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'subcategories';
+        value: string | Subcategory;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: string | Testimonial;
+      } | null);
+  globalSlug?: string | null;
+  user: {
+    relationTo: 'users';
+    value: string | User;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
@@ -112,6 +474,248 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  featured?: T;
+  displayOrder?: T;
+  image?: T;
+  bannerImage?: T;
+  subcategories?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subcategories_select".
+ */
+export interface SubcategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  category?: T;
+  description?: T;
+  displayOrder?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  price?: T;
+  category?: T;
+  subcategory?: T;
+  status?: T;
+  featured?: T;
+  trending?: T;
+  sku?: T;
+  mainImage?: T;
+  colorVariations?:
+    | T
+    | {
+        color?: T;
+        colorCode?: T;
+        image?: T;
+        additionalImages?:
+          | T
+          | {
+              image?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  sizeVariations?:
+    | T
+    | {
+        size?: T;
+        measurements?:
+          | T
+          | {
+              chest?: T;
+              shoulder?: T;
+              sleeve?: T;
+              length?: T;
+              waist?: T;
+              hip?: T;
+            };
+        inStock?: T;
+        id?: T;
+      };
+  heightRanges?:
+    | T
+    | {
+        min?: T;
+        max?: T;
+        label?: T;
+        id?: T;
+      };
+  allowCustomMeasurements?: T;
+  customMeasurementFields?:
+    | T
+    | {
+        fieldName?: T;
+        unit?: T;
+        required?: T;
+        id?: T;
+      };
+  metadata?:
+    | T
+    | {
+        material?: T;
+        careInstructions?: T;
+        tags?:
+          | T
+          | {
+              tag?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  customer?: T;
+  status?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        color?: T;
+        size?: T;
+        height?: T;
+        customMeasurements?: T;
+        price?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  shipping?: T;
+  tax?: T;
+  total?: T;
+  shippingAddress?:
+    | T
+    | {
+        fullName?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
+  billingAddress?:
+    | T
+    | {
+        sameAsShipping?: T;
+        fullName?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
+  paymentMethod?: T;
+  paymentStatus?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  customerName?: T;
+  customerImage?: T;
+  rating?: T;
+  text?: T;
+  active?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents_select".
+ */
+export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences_select".
+ */
+export interface PayloadPreferencesSelect<T extends boolean = true> {
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations_select".
+ */
+export interface PayloadMigrationsSelect<T extends boolean = true> {
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
