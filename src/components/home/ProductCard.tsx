@@ -14,7 +14,7 @@ interface ProductCardProps {
     mainImage?: {
       url: string
     }
-    staticImage?: string // For using static images from public folder
+    staticImage?: string 
   }
   imageWidth?: number
   imageHeight?: number
@@ -24,7 +24,7 @@ export default function ProductCard({
   product,
   imageWidth = 400,
   imageHeight = 500,
-}: ProductCardProps) {
+}: ReadOnly<ProductCardProps>) {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
