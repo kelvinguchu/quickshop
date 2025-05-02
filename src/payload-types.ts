@@ -249,12 +249,17 @@ export interface Product {
   status: 'active' | 'draft' | 'out-of-stock';
   featured?: boolean | null;
   trending?: boolean | null;
-  sku: string;
+  sku?: string | null;
   mainImage: string | Media;
+  color: string;
+  /**
+   * Hex code or color name for the main color
+   */
+  colorCode?: string | null;
   colorVariations?:
     | {
         color: string;
-        colorCode: string;
+        colorCode?: string | null;
         image: string | Media;
         additionalImages?:
           | {
@@ -268,20 +273,6 @@ export interface Product {
   sizeVariations?:
     | {
         size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
-        measurements: {
-          chest: number;
-          shoulder: number;
-          sleeve: number;
-          length: number;
-          /**
-           * Required for specific product types like abaya
-           */
-          waist?: number | null;
-          /**
-           * Required for specific product types like abaya
-           */
-          hip?: number | null;
-        };
         inStock?: boolean | null;
         id?: string | null;
       }[]
@@ -297,25 +288,6 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
-  allowCustomMeasurements?: boolean | null;
-  customMeasurementFields?:
-    | {
-        fieldName: string;
-        unit: 'cm' | 'in';
-        required?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  metadata?: {
-    material?: string | null;
-    careInstructions?: string | null;
-    tags?:
-      | {
-          tag?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
   updatedAt: string;
   createdAt: string;
 }
@@ -553,6 +525,8 @@ export interface ProductsSelect<T extends boolean = true> {
   trending?: T;
   sku?: T;
   mainImage?: T;
+  color?: T;
+  colorCode?: T;
   colorVariations?:
     | T
     | {
@@ -571,16 +545,6 @@ export interface ProductsSelect<T extends boolean = true> {
     | T
     | {
         size?: T;
-        measurements?:
-          | T
-          | {
-              chest?: T;
-              shoulder?: T;
-              sleeve?: T;
-              length?: T;
-              waist?: T;
-              hip?: T;
-            };
         inStock?: T;
         id?: T;
       };
@@ -591,27 +555,6 @@ export interface ProductsSelect<T extends boolean = true> {
         max?: T;
         label?: T;
         id?: T;
-      };
-  allowCustomMeasurements?: T;
-  customMeasurementFields?:
-    | T
-    | {
-        fieldName?: T;
-        unit?: T;
-        required?: T;
-        id?: T;
-      };
-  metadata?:
-    | T
-    | {
-        material?: T;
-        careInstructions?: T;
-        tags?:
-          | T
-          | {
-              tag?: T;
-              id?: T;
-            };
       };
   updatedAt?: T;
   createdAt?: T;

@@ -2,8 +2,8 @@ import React from 'react'
 import '../global.css'
 import './styles.css'
 import { cinzel, cormorant, montserrat } from '../fonts'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 import { CartProvider } from '@/lib/cart/CartContext'
 
 export const metadata = {

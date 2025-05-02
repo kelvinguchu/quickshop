@@ -78,7 +78,7 @@ export const Products: CollectionConfig = {
     {
       name: 'sku',
       type: 'text',
-      required: true,
+      required: false,
       unique: true,
     },
     {
@@ -87,12 +87,27 @@ export const Products: CollectionConfig = {
       relationTo: 'media',
       required: true,
     },
-    // Product Color Variations
+    // Main Color
+    {
+      name: 'color',
+      type: 'text',
+      label: 'Main Color',
+      required: true,
+    },
+    {
+      name: 'colorCode',
+      type: 'text',
+      label: 'Color Code (Hex)',
+      required: false,
+      admin: {
+        description: 'Hex code or color name for the main color',
+      },
+    },
+    // Product Color Variations - Additional color options
     {
       name: 'colorVariations',
       type: 'array',
-      label: 'Color Variations',
-      minRows: 1,
+      label: 'Additional Color Variations',
       fields: [
         {
           name: 'color',
@@ -102,7 +117,7 @@ export const Products: CollectionConfig = {
         {
           name: 'colorCode',
           type: 'text', // Hex code or color name
-          required: true,
+          required: false,
         },
         {
           name: 'image',
@@ -145,52 +160,6 @@ export const Products: CollectionConfig = {
           ],
         },
         {
-          name: 'measurements',
-          type: 'group',
-          fields: [
-            {
-              name: 'chest',
-              type: 'number',
-              label: 'Chest (cm)',
-              required: true,
-            },
-            {
-              name: 'shoulder',
-              type: 'number',
-              label: 'Shoulder (cm)',
-              required: true,
-            },
-            {
-              name: 'sleeve',
-              type: 'number',
-              label: 'Sleeve Length (cm)',
-              required: true,
-            },
-            {
-              name: 'length',
-              type: 'number',
-              label: 'Total Length (cm)',
-              required: true,
-            },
-            {
-              name: 'waist',
-              type: 'number',
-              label: 'Waist (cm)',
-              admin: {
-                description: 'Required for specific product types like abaya',
-              },
-            },
-            {
-              name: 'hip',
-              type: 'number',
-              label: 'Hip (cm)',
-              admin: {
-                description: 'Required for specific product types like abaya',
-              },
-            },
-          ],
-        },
-        {
           name: 'inStock',
           type: 'checkbox',
           defaultValue: true,
@@ -221,68 +190,6 @@ export const Products: CollectionConfig = {
           admin: {
             description: 'E.g., "Short", "Regular", "Tall"',
           },
-        },
-      ],
-    },
-    // Custom Measurement Options
-    {
-      name: 'allowCustomMeasurements',
-      type: 'checkbox',
-      defaultValue: true,
-      label: 'Allow Custom Measurements',
-    },
-    {
-      name: 'customMeasurementFields',
-      type: 'array',
-      label: 'Custom Measurement Fields',
-      admin: {
-        condition: (data) => data?.allowCustomMeasurements,
-      },
-      fields: [
-        {
-          name: 'fieldName',
-          type: 'text',
-          required: true,
-        },
-        {
-          name: 'unit',
-          type: 'select',
-          required: true,
-          defaultValue: 'cm',
-          options: [
-            { label: 'Centimeters (cm)', value: 'cm' },
-            { label: 'Inches (in)', value: 'in' },
-          ],
-        },
-        {
-          name: 'required',
-          type: 'checkbox',
-          defaultValue: true,
-        },
-      ],
-    },
-    // Additional Product Metadata
-    {
-      name: 'metadata',
-      type: 'group',
-      fields: [
-        {
-          name: 'material',
-          type: 'text',
-        },
-        {
-          name: 'careInstructions',
-          type: 'textarea',
-        },
-        {
-          name: 'tags',
-          type: 'array',
-          fields: [
-            {
-              name: 'tag',
-              type: 'text',
-            },
-          ],
         },
       ],
     },

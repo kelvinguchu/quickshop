@@ -1,15 +1,16 @@
 import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
 import { getPayload } from 'payload'
+import Link from 'next/link'
+import Image from 'next/image'
+import { FaArrowRight, FaSearch, FaMagic, FaShippingFast } from 'react-icons/fa'
 
 import config from '@/payload.config'
-import Hero from '@/components/Hero'
-import SectionTitle from '@/components/SectionTitle'
-import ProductCard from '@/components/ProductCard'
-import CategoryCard from '@/components/CategoryCard'
-import TestimonialCard from '@/components/TestimonialCard'
-import FAQ from '@/components/FAQ'
+import Hero from '@/components/home/Hero'
+import SectionTitle from '@/components/home/SectionTitle'
+import ProductCard from '@/components/home/ProductCard'
+import CategoryCard from '@/components/home/CategoryCard'
+import TestimonialCard from '@/components/home/TestimonialCard'
+import FAQ from '@/components/home/FAQ'
 
 // Static data for FAQs
 const faqData = [
@@ -40,84 +41,61 @@ const faqData = [
   },
 ]
 
-// Static data for abayas when CMS data is not available
-const staticAbayas = [
+// Static testimonials as fallback
+const staticTestimonials = [
   {
-    id: 'abaya1',
-    name: 'Elegant Black Abaya',
-    price: 129.99,
-    staticImage: '/abayas/abaya1.webp',
+    id: 'testimonial1',
+    customerName: 'Aisha Rahman',
+    text: 'I am absolutely in love with my new abaya! The quality of the fabric is exceptional and the attention to detail in the embroidery is stunning.',
+    rating: 5,
   },
   {
-    id: 'abaya2',
-    name: 'Royal Gold Trim Abaya',
-    price: 149.99,
-    staticImage: '/abayas/abaya2.webp',
+    id: 'testimonial2',
+    customerName: 'Yusuf Ali',
+    text: "The custom measurements option was perfect for me. My qamis fits beautifully and the quality is far superior to anything I've purchased before.",
+    rating: 5,
   },
   {
-    id: 'abaya3',
-    name: 'Classic Embroidered Abaya',
-    price: 139.99,
-    staticImage: '/abayas/abaya3.webp',
+    id: 'testimonial3',
+    customerName: 'Fatima Zahra',
+    text: "Quick delivery and the product was exactly as pictured. I've already received many compliments on my new abaya!",
+    rating: 4,
   },
   {
-    id: 'abaya4',
-    name: 'Modern Cut Abaya',
-    price: 159.99,
-    staticImage: '/abayas/abaya4.webp',
-  },
-]
-
-// Static data for qamis when CMS data is not available
-const staticQamis = [
-  {
-    id: 'qamis1',
-    name: 'Classic White Qamis',
-    price: 99.99,
-    staticImage: '/qamis/qamis1.webp',
-  },
-  {
-    id: 'qamis2',
-    name: 'Premium Embroidered Qamis',
-    price: 119.99,
-    staticImage: '/qamis/qamis2.webp',
-  },
-  {
-    id: 'qamis3',
-    name: 'Modern Cut Qamis',
-    price: 109.99,
-    staticImage: '/qamis/qamis3.webp',
-  },
-  {
-    id: 'qamis4',
-    name: 'Royal Blue Qamis',
-    price: 129.99,
-    staticImage: '/qamis/qamis4.webp',
+    id: 'testimonial4',
+    customerName: 'Ahmed Hassan',
+    text: 'Excellent customer service! They helped me choose the right size and the qamis arrived perfectly tailored.',
+    rating: 5,
   },
 ]
 
-// Static data for categories when CMS data is not available
-const staticCategories = [
-  {
-    id: 'abaya',
-    name: 'Abayas',
-    slug: 'abaya',
-    staticImage: '/abayas/abaya5.webp',
-  },
-  {
-    id: 'qamis',
-    name: 'Qamis',
-    slug: 'qamis',
-    staticImage: '/qamis/qamis5.webp',
-  },
-  {
-    id: 'hijabs',
-    name: 'Hijabs',
-    parentCategory: 'abaya',
-    slug: 'hijabs',
-    staticImage: '/abayas/abaya6.webp',
-  },
-]
+// Fallback component when no products are available
+const EmptyProductsSection = ({ collectionType, collectionName }) => (
+  <div className="bg-gray-50 rounded-lg py-10 px-6 text-center">
+    <div className="mb-6 relative h-[200px] w-[200px] mx-auto">
+      <Image
+        src={`/${collectionType}/${collectionType}1.webp`}
+        alt={`${collectionName} Image`}
+        fill
+        sizes="200px"
+        className="rounded-lg object-cover"
+      />
+    </div>
+    <h3 className="font-cinzel text-xl font-semibold text-[#382f21] mb-3">
+      No Trending {collectionName} Available
+    </h3>
+    <p className="text-gray-600 mb-6">
+      We're currently updating our collection. Please check back soon or explore our complete
+      catalog.
+    </p>
+    <Link
+      href={`/collections/${collectionType}`}
+      className="inline-flex items-center px-5 py-2.5 bg-[#382f21] text-white font-montserrat text-sm rounded hover:bg-[#4e4538] transition-colors"
+    >
+      Browse All {collectionName} <FaArrowRight className="ml-2 w-3 h-3" />
+    </Link>
+  </div>
+)
 
 export default async function HomePage() {
   const payloadConfig = await config
@@ -145,13 +123,13 @@ export default async function HomePage() {
   }
 
   try {
-    // Fetch trending Abayas
+    // Fetch trending Abayas - properly using the relationship query
     trendingAbayas = await payload.find({
       collection: 'products',
       where: {
-        AND: [
+        and: [
           {
-            category: {
+            'category.slug': {
               equals: 'abaya',
             },
           },
@@ -160,22 +138,28 @@ export default async function HomePage() {
               equals: true,
             },
           },
+          {
+            status: {
+              equals: 'active',
+            },
+          },
         ],
       },
       limit: 4,
+      depth: 1,
     })
   } catch (error) {
     console.error('Error fetching abayas:', error)
   }
 
   try {
-    // Fetch trending Qamis
+    // Fetch trending Qamis - properly using the relationship query
     trendingQamis = await payload.find({
       collection: 'products',
       where: {
-        AND: [
+        and: [
           {
-            category: {
+            'category.slug': {
               equals: 'qamis',
             },
           },
@@ -184,9 +168,15 @@ export default async function HomePage() {
               equals: true,
             },
           },
+          {
+            status: {
+              equals: 'active',
+            },
+          },
         ],
       },
       limit: 4,
+      depth: 1,
     })
   } catch (error) {
     console.error('Error fetching qamis:', error)
@@ -216,42 +206,22 @@ export default async function HomePage() {
     console.error('Error fetching testimonials:', error)
   }
 
-  // Use static data if CMS data is not available
-  const categoriesToDisplay =
-    featuredCategories.docs.length > 0 ? featuredCategories.docs : staticCategories
+  // Add custom category directly to the display list, no static fallbacks
+  const customCategory = {
+    id: 'custom',
+    name: 'Custom Made',
+    slug: 'custom',
+    staticImage: '/abayas/abaya1.webp',
+    isCustom: true,
+  }
 
-  const abayasToDisplay = trendingAbayas.docs.length > 0 ? trendingAbayas.docs : staticAbayas
+  const categoriesToDisplay = [...featuredCategories.docs, customCategory]
 
-  const qamisToDisplay = trendingQamis.docs.length > 0 ? trendingQamis.docs : staticQamis
+  // Use CMS data directly without static fallbacks for products
+  const abayasToDisplay = trendingAbayas.docs
+  const qamisToDisplay = trendingQamis.docs
 
-  // Static testimonials if CMS data is not available
-  const staticTestimonials = [
-    {
-      id: 'testimonial1',
-      customerName: 'Aisha Rahman',
-      text: 'I am absolutely in love with my new abaya! The quality of the fabric is exceptional and the attention to detail in the embroidery is stunning.',
-      rating: 5,
-    },
-    {
-      id: 'testimonial2',
-      customerName: 'Yusuf Ali',
-      text: "The custom measurements option was perfect for me. My qamis fits beautifully and the quality is far superior to anything I've purchased before.",
-      rating: 5,
-    },
-    {
-      id: 'testimonial3',
-      customerName: 'Fatima Zahra',
-      text: "Quick delivery and the product was exactly as pictured. I've already received many compliments on my new abaya!",
-      rating: 4,
-    },
-    {
-      id: 'testimonial4',
-      customerName: 'Ahmed Hassan',
-      text: 'Excellent customer service! They helped me choose the right size and the qamis arrived perfectly tailored.',
-      rating: 5,
-    },
-  ]
-
+  // Use static testimonials as fallback
   const testimonialsToDisplay =
     testimonials.docs.length > 0 ? testimonials.docs : staticTestimonials
 
@@ -283,11 +253,15 @@ export default async function HomePage() {
             ctaLink="/collections/abaya"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {abayasToDisplay.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {abayasToDisplay.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {abayasToDisplay.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <EmptyProductsSection collectionType="abayas" collectionName="Abayas" />
+          )}
         </div>
       </section>
 
@@ -297,20 +271,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#382f21] flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-8 h-8 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <FaSearch className="w-7 h-7 text-white" />
               </div>
               <h3 className="font-cinzel text-xl font-semibold text-[#382f21] mb-2">
                 Premium Quality
@@ -322,20 +283,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#382f21] flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-8 h-8 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                  />
-                </svg>
+                <FaMagic className="w-7 h-7 text-white" />
               </div>
               <h3 className="font-cinzel text-xl font-semibold text-[#382f21] mb-2">
                 Custom Tailoring
@@ -347,20 +295,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#382f21] flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-8 h-8 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
-                  />
-                </svg>
+                <FaShippingFast className="w-7 h-7 text-white" />
               </div>
               <h3 className="font-cinzel text-xl font-semibold text-[#382f21] mb-2">
                 Worldwide Shipping
@@ -383,11 +318,15 @@ export default async function HomePage() {
             ctaLink="/collections/qamis"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {qamisToDisplay.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {qamisToDisplay.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {qamisToDisplay.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <EmptyProductsSection collectionType="qamis" collectionName="Qamis" />
+          )}
         </div>
       </section>
 
@@ -426,7 +365,7 @@ export default async function HomePage() {
               Subscribe
             </button>
           </form>
-      </div>
+        </div>
       </section>
 
       {/* FAQ Section */}
@@ -435,7 +374,7 @@ export default async function HomePage() {
           <SectionTitle title="Frequently Asked Questions" subtitle="Need help?" />
 
           <FAQ faqs={faqData} />
-      </div>
+        </div>
       </section>
     </div>
   )

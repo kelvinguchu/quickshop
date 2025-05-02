@@ -1,5 +1,6 @@
 import React from 'react'
 import { FaLongArrowAltRight } from 'react-icons/fa'
+import Link from 'next/link'
 
 interface SectionTitleProps {
   title: string
@@ -20,7 +21,7 @@ export default function SectionTitle({
 }: SectionTitleProps) {
   return (
     <div className={`mb-12 ${alignment === 'center' ? 'text-center' : 'text-left'} ${className}`}>
-      <div className="relative">
+      <div className="flex flex-col">
         {subtitle && (
           <span className="font-cormorant italic text-[#8a7d65] text-lg md:text-xl mb-2 block">
             {subtitle}
@@ -33,12 +34,14 @@ export default function SectionTitle({
         </h2>
 
         {ctaText && ctaLink && (
-          <a
-            href={ctaLink}
-            className="inline-flex items-center mt-4 font-montserrat text-sm uppercase tracking-wider text-[#8a7d65] hover:text-[#382f21] transition-colors"
-          >
-            {ctaText} <FaLongArrowAltRight className="ml-2" />
-          </a>
+          <div className="w-full flex justify-end mt-4">
+            <Link
+              href={ctaLink}
+              className="inline-flex items-center font-montserrat text-sm uppercase tracking-wider text-[#8a7d65] hover:text-[#382f21] transition-colors"
+            >
+              {ctaText} <FaLongArrowAltRight className="ml-2" />
+            </Link>
+          </div>
         )}
       </div>
     </div>

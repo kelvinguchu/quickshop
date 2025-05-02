@@ -12,6 +12,7 @@ interface CategoryCardProps {
       url: string
     }
     staticImage?: string // For using static images from public folder
+    isCustom?: boolean // Flag for custom category
   }
 }
 
@@ -20,14 +21,19 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   const imageSource = category.image?.url || category.staticImage || '/placeholder-category.jpg'
 
   // Create the link URL based on available data
-  const linkUrl = category.parentCategory
-    ? `/collections/${category.parentCategory}/${category.slug}`
-    : `/collections/${category.slug || category.id}`
+  const linkUrl = category.isCustom
+    ? '/custom' // Direct to custom page for custom category
+    : category.parentCategory
+      ? `/collections/${category.parentCategory}/${category.slug}`
+      : `/collections/${category.slug || category.id}`
+
+  // Custom button text based on category type
+  const buttonText = category.isCustom ? 'Get Custom Order' : 'Explore Collection'
 
   return (
     <div className="group relative overflow-hidden rounded-sm">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-[#1a1a1a]/20 transition-all duration-500 group-hover:bg-[#1a1a1a]/40 z-10"></div>
+      {/* Dark overlay to ensure text visibility */}
+      <div className="absolute inset-0 bg-black/40 z-10"></div>
 
       {/* Image */}
       <div className="relative h-[450px] w-full overflow-hidden">
@@ -40,16 +46,16 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         />
       </div>
 
-      {/* Content */}
+      {/* Content - always visible */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-6">
-        <h3 className="font-cinzel text-2xl md:text-3xl font-semibold text-white mb-2 transform transition-transform duration-500 group-hover:translate-y-0">
+        <h3 className="font-cinzel text-2xl md:text-3xl font-semibold text-white mb-4">
           {category.name}
         </h3>
         <Link
           href={linkUrl}
-          className="inline-flex items-center font-montserrat text-xs uppercase tracking-wider bg-transparent text-white border border-white/70 px-5 py-2 mt-4 opacity-0 transform translate-y-4 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-white/20"
+          className="inline-flex items-center font-montserrat text-xs uppercase tracking-wider bg-white text-black border border-white px-5 py-2 hover:bg-[#d4af37] hover:border-[#d4af37] transition-colors"
         >
-          Explore Collection
+          {buttonText}
           <FaArrowRight className="ml-2 h-3 w-3" />
         </Link>
       </div>

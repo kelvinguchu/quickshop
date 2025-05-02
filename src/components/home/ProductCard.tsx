@@ -33,37 +33,31 @@ export default function ProductCard({
 
   return (
     <div
-      className="group relative"
+      className="group relative border border-[#e0d8c9] rounded-sm shadow-sm hover:shadow-md transition-all"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Product Image */}
       <Link
-        href={`/products/${product.slug || product.id}`}
+        href={`/products/${product.id}`}
         className="block overflow-hidden bg-[#f5f2ec]"
       >
-        <div className="relative h-[350px] w-full overflow-hidden transition-all">
+        <div className="relative aspect-[4/5] w-full overflow-hidden">
           <Image
             src={imageSource}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`object-cover transition-all duration-700 ${
-              isHovered ? 'scale-110' : 'scale-100'
-            }`}
+            className="object-cover top-center transition-all duration-700"
           />
         </div>
       </Link>
 
-      {/* Quick Actions */}
-      <div
-        className={`absolute right-4 top-4 flex flex-col gap-2 transition-opacity duration-300 ${
-          isHovered ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
+      {/* Wishlist button - always visible */}
+      <div className="absolute right-3 top-3">
         <button
           onClick={() => setIsWishlisted(!isWishlisted)}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md hover:bg-[#f9f6f2] transition-colors"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md hover:bg-[#f9f6f2] transition-colors"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           {isWishlisted ? (
@@ -74,28 +68,24 @@ export default function ProductCard({
         </button>
       </div>
 
-      {/* Add to Cart Button */}
-      <div
-        className={`absolute bottom-[72px] left-0 right-0 text-center transition-all duration-300 ${
-          isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <button className="mx-auto flex items-center justify-center gap-2 bg-[#382f21] px-6 py-2 font-montserrat text-sm uppercase tracking-wider text-white hover:bg-[#4e4538] transition-colors">
-          <FaShoppingBag className="h-4 w-4" />
-          <span>Add to Cart</span>
-        </button>
-      </div>
-
       {/* Product Info */}
-      <div className="mt-4 px-2 text-center">
-        <h3 className="font-cinzel text-base font-medium text-[#382f21]">
-          <Link href={`/products/${product.slug || product.id}`} className="hover:underline">
+      <div className="px-3 py-1.5">
+        <h3 className="font-cinzel text-sm font-medium text-[#382f21] text-left leading-tight -mb-4">
+          <Link href={`/products/${product.id}`} className="hover:underline">
             {product.name}
           </Link>
         </h3>
-        <p className="mt-1 font-cormorant text-lg font-semibold text-[#8a7d65]">
+        <p className="font-cormorant -mt-4 text-lg font-semibold text-[#8a7d65] text-left leading-tight">
           ${product.price.toFixed(2)}
         </p>
+
+        {/* Add to Cart Button - always visible */}
+        <div className="mt-1">
+          <button className="w-full flex items-center justify-center gap-1 bg-[#382f21] px-4 py-1.5 font-montserrat text-xs uppercase tracking-wider text-white hover:bg-[#4e4538] transition-colors">
+            <FaShoppingBag className="h-3 w-3" />
+            <span>Add to Cart</span>
+          </button>
+        </div>
       </div>
     </div>
   )

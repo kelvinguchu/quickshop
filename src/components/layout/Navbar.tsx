@@ -141,7 +141,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`w-full fixed top-0 left-0 z-50 transition-all duration-300
+      className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 border-b border-[#e6ded0]/60
       ${isScrolled ? 'bg-white shadow-md' : 'bg-white'}`}
     >
       <div className="container mx-auto px-4">
