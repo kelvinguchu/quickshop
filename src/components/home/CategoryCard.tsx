@@ -2,23 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 
-// Accept both Payload-generated Category and a custom fallback type
 import type { Category as PayloadCategory, Media } from "@/payload-types";
 
-type CustomCategory = {
-  id: string;
-  name: string;
-  slug: string;
-  staticImage: string;
-  isCustom: true;
+// Allow any category plus optional custom fields
+type CategoryCardData = PayloadCategory & {
+  staticImage?: string;
+  isCustom?: boolean;
+  parentCategory?: string;
 };
 
-type CategoryCardData = PayloadCategory | CustomCategory;
-
 interface CategoryCardProps {
-  category: CategoryCardData & {
-    parentCategory?: string;
-  };
+  category: CategoryCardData;
 }
 
 export default function CategoryCard({ category }: CategoryCardProps) {
@@ -39,14 +33,14 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   }
 
   // Create the link URL based on available data
-  const linkUrl = (category as CustomCategory).isCustom
-    ? "/custom" // Direct to custom page for custom category
+  const linkUrl = category.isCustom
+    ? "/custom"
     : category.parentCategory
       ? `/collections/${category.parentCategory}/${category.slug}`
       : `/collections/${category.slug || category.id}`;
 
   // Custom button text based on category type
-  const buttonText = (category as CustomCategory).isCustom
+  const buttonText = category.isCustom
     ? "Get Custom Order"
     : "Explore Collection";
 
