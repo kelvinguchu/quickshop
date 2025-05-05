@@ -70,8 +70,8 @@ export default function SubcategoryDisplay({
           category={category}
           subcategory={subcategory}
           siblingSubcategories={siblingSubcategories}
-          currentSort={currentSort}
-        />
+              currentSort={currentSort}
+            />
 
         {/* Product grid */}
         {products.length > 0 ? (
