@@ -159,7 +159,7 @@ export default async function SubcategoryPage({
 
   try {
     // Fetch all subcategories for the current category (siblings)
-    siblingSubcategories = await payload.find({
+    siblingSubcategories = await payload.find<"subcategories", Subcategory>({
       collection: "subcategories",
       where: {
         category: {
@@ -191,7 +191,7 @@ export default async function SubcategoryPage({
     };
 
     // Fetch products with explicit generic type
-    products = await payload.find<"products">(productsQuery);
+    products = await payload.find<"products", Product>(productsQuery);
   } catch (error) {
     console.error("Error fetching products:", error);
   }
