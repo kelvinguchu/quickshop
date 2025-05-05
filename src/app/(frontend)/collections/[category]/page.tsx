@@ -137,8 +137,8 @@ export default async function CategoryPage({
   }
 
   try {
-    // Build the query for products
-    const productsQuery = {
+    // Fetch products directly with literal query object
+    products = await payload.find<"products", ProductsSelect<true>>({
       collection: "products",
       where: {
         category: {
@@ -152,12 +152,7 @@ export default async function CategoryPage({
             ? "price"
             : "-createdAt",
       limit: 12,
-    };
-
-    // Fetch products
-    products = await payload.find<"products", ProductsSelect<true>>(
-      productsQuery
-    );
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
   }
