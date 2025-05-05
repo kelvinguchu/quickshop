@@ -98,33 +98,30 @@ export default function Navbar() {
         const subcategoriesData = await subcategoriesResponse.json();
 
         // Create a map of categories by ID for quick lookup
-        const categoriesMap: Record<string, CategoryUI> = {}(
-          categoriesData.docs as PayloadCategory[]
-        )
-          .forEach((cat) => {
-            categoriesMap[cat.id] = {
-              id: cat.id,
-              name: cat.name,
-              slug: cat.slug,
-              subcategories: [], // Initialize empty subcategories array
-            };
-          })(
-            // Organize subcategories
-            subcategoriesData.docs as PayloadSubcategory[]
-          )
-          .forEach((subcat) => {
-            const categoryId =
-              typeof subcat.category === "object"
-                ? subcat.category?.id
-                : subcat.category;
-            if (categoryId && categoriesMap[categoryId]) {
-              categoriesMap[categoryId].subcategories.push({
-                id: subcat.id,
-                name: subcat.name,
-                slug: subcat.slug,
-              });
-            }
-          });
+        const categoriesMap: Record<string, CategoryUI> = {};
+        (categoriesData.docs as PayloadCategory[]).forEach((cat) => {
+          categoriesMap[cat.id] = {
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            subcategories: [], // Initialize empty subcategories array
+          };
+        });
+
+        // Organize subcategories
+        (subcategoriesData.docs as PayloadSubcategory[]).forEach((subcat) => {
+          const categoryId =
+            typeof subcat.category === "object"
+              ? subcat.category?.id
+              : subcat.category;
+          if (categoryId && categoriesMap[categoryId]) {
+            categoriesMap[categoryId].subcategories.push({
+              id: subcat.id,
+              name: subcat.name,
+              slug: subcat.slug,
+            });
+          }
+        });
 
         setCategories(Object.values(categoriesMap));
       } catch (error) {
