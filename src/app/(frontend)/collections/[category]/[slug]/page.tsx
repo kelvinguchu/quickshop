@@ -190,8 +190,8 @@ export default async function SubcategoryPage({
       limit: 12,
     };
 
-    // Fetch products
-    products = await payload.find(productsQuery);
+    // Fetch products with explicit generic type
+    products = await payload.find<"products">(productsQuery);
   } catch (error) {
     console.error("Error fetching products:", error);
   }
