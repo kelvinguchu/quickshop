@@ -111,7 +111,9 @@ export default function ProductCard({
   };
 
   // Handle wishlist toggle
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (isWishlisted) {
       removeFromWishlist(product.id);
       setIsWishlisted(false);
@@ -128,7 +130,9 @@ export default function ProductCard({
   };
 
   // Handle add to cart
-  const handleAddToCart = (e) => {
+  const handleAddToCart = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (!isInCart) {
       addItem({
         id: product.id,
