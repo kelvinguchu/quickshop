@@ -3,17 +3,7 @@ import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
-
-// Define the Subcategory interface to match the one in SubcategoryDisplay component
-interface Subcategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  bannerImage?: {
-    url: string;
-  };
-}
+import { Subcategory } from "@/payload-types";
 
 export async function generateMetadata({
   params,
@@ -141,7 +131,7 @@ export default async function SubcategoryPage({
   const subcategoryId = subcategoryDoc.id;
 
   // Initialize with empty data
-  let siblingSubcategories = { docs: [] as Subcategory[] };
+  let siblingSubcategories: { docs: Subcategory[] } = { docs: [] };
   let products = { docs: [], totalDocs: 0 };
 
   try {
