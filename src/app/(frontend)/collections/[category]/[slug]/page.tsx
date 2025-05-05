@@ -4,6 +4,17 @@ import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
 
+// Define the Subcategory interface to match the one in SubcategoryDisplay component
+interface Subcategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  bannerImage?: {
+    url: string;
+  };
+}
+
 export async function generateMetadata({
   params,
 }: {
