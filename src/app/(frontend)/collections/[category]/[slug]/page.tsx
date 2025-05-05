@@ -4,6 +4,7 @@ import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
 import { Subcategory, Product } from "@/payload-types";
+import type { PaginatedDocs } from "payload/types";
 
 export async function generateMetadata({
   params,
@@ -131,10 +132,29 @@ export default async function SubcategoryPage({
   const subcategoryId = subcategoryDoc.id;
 
   // Initialize with empty data
-  let siblingSubcategories: { docs: Subcategory[] } = { docs: [] };
-  let products: { docs: Product[]; totalDocs: number } = {
+  let siblingSubcategories: PaginatedDocs<Subcategory> = {
     docs: [],
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 0,
+    nextPage: null,
+    page: 1,
+    pagingCounter: 0,
+    prevPage: null,
     totalDocs: 0,
+    totalPages: 0,
+  };
+  let products: PaginatedDocs<Product> = {
+    docs: [],
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 0,
+    nextPage: null,
+    page: 1,
+    pagingCounter: 0,
+    prevPage: null,
+    totalDocs: 0,
+    totalPages: 0,
   };
 
   try {
