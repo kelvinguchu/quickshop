@@ -9,7 +9,7 @@ interface Subcategory {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: string | null;
   bannerImage?: {
     url: string;
   };
