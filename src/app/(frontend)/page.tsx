@@ -9,7 +9,7 @@ import Hero from '@/components/home/Hero'
 import SectionTitle from '@/components/home/SectionTitle'
 import ProductCard from '@/components/home/ProductCard'
 import CategoryCard from '@/components/home/CategoryCard'
-import TestimonialCard from '@/components/home/TestimonialCard'
+import TestimonialMarquee from '@/components/home/TestimonialMarquee'
 import FAQ from '@/components/home/FAQ'
 
 // Static data for FAQs
@@ -123,7 +123,7 @@ export default async function HomePage() {
   }
 
   try {
-    // Fetch trending Abayas - properly using the relationship query
+    // Fetch trending Abayas - Increased limit to 10
     trendingAbayas = await payload.find({
       collection: 'products',
       where: {
@@ -145,7 +145,7 @@ export default async function HomePage() {
           },
         ],
       },
-      limit: 4,
+      limit: 10,
       depth: 1,
     })
   } catch (error) {
@@ -153,7 +153,7 @@ export default async function HomePage() {
   }
 
   try {
-    // Fetch trending Qamis - properly using the relationship query
+    // Fetch trending Qamis - Increased limit to 10
     trendingQamis = await payload.find({
       collection: 'products',
       where: {
@@ -175,7 +175,7 @@ export default async function HomePage() {
           },
         ],
       },
-      limit: 4,
+      limit: 10,
       depth: 1,
     })
   } catch (error) {
@@ -228,14 +228,16 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <Hero />
+      <div className="-mt-4 md:mt-6">
+        <Hero />
+      </div>
 
       {/* Categories Section */}
-      <section className="py-16 bg-[#f9f6f2]">
+      <section className="py-4 md:py-16 bg-[#f9f6f2]">
         <div className="container mx-auto px-4">
           <SectionTitle title="Shop by Category" subtitle="Explore our collections" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {categoriesToDisplay.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
@@ -244,31 +246,37 @@ export default async function HomePage() {
       </section>
 
       {/* Trending Abayas Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <SectionTitle
-            title="Trending Abayas"
-            subtitle="Our most popular designs"
-            ctaText="View All Abayas"
-            ctaLink="/collections/abaya"
-          />
+          <SectionTitle title="Trending Abayas" subtitle="Our most popular designs" />
 
           {abayasToDisplay.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {abayasToDisplay.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {abayasToDisplay.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              <div className="mt-8 md:mt-10 text-center">
+                <Link
+                  href="/collections/abaya"
+                  className="inline-flex items-center px-6 py-3 bg-transparent text-[#382f21] border border-[#382f21] font-montserrat text-sm rounded hover:bg-[#4e4538] hover:text-white hover:border-[#4e4538] transition-colors"
+                >
+                  View All Abayas <FaArrowRight className="ml-2 w-3 h-3" />
+                </Link>
+              </div>
+            </>
           ) : (
             <EmptyProductsSection collectionType="abayas" collectionName="Abayas" />
           )}
         </div>
       </section>
 
-      {/* Unique Selling Proposition */}
-      <section className="py-16 bg-[#f5f2ec]">
+      {/* Unique Selling Proposition - Hidden on mobile, visible on md screens and up */}
+      <section className="hidden md:block py-10 md:py-16 bg-[#f5f2ec]">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 text-center">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#382f21] flex items-center justify-center mb-4">
                 <FaSearch className="w-7 h-7 text-white" />
@@ -309,71 +317,49 @@ export default async function HomePage() {
       </section>
 
       {/* Trending Qamis Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <SectionTitle
-            title="Trending Qamis"
-            subtitle="Handcrafted with precision"
-            ctaText="View All Qamis"
-            ctaLink="/collections/qamis"
-          />
+          <SectionTitle title="Trending Qamis" subtitle="Handcrafted with precision" />
 
           {qamisToDisplay.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {qamisToDisplay.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {qamisToDisplay.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              <div className="mt-8 md:mt-10 text-center">
+                <Link
+                  href="/collections/qamis"
+                  className="inline-flex items-center px-6 py-3 bg-transparent text-[#382f21] border border-[#382f21] font-montserrat text-sm rounded hover:bg-[#4e4538] hover:text-white hover:border-[#4e4538] transition-colors"
+                >
+                  View All Qamis <FaArrowRight className="ml-2 w-3 h-3" />
+                </Link>
+              </div>
+            </>
           ) : (
             <EmptyProductsSection collectionType="qamis" collectionName="Qamis" />
           )}
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-16 bg-[#f9f6f2]">
+      {/* Testimonials Section with Marquee */}
+      <section className="py-10 md:py-16 bg-[#f9f6f2]">
         <div className="container mx-auto px-4">
           <SectionTitle title="What Our Customers Say" subtitle="Testimonials" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {testimonialsToDisplay.map((testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-16 bg-[#382f21] text-white">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="font-cinzel text-3xl font-bold mb-4">Join Our Newsletter</h2>
-          <p className="font-cormorant text-xl mb-8 text-[#e6ded0]">
-            Subscribe to receive updates on new collections, special offers, and styling tips.
-          </p>
-
-          <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-grow px-4 py-3 bg-white/10 border border-[#e6ded0]/30 placeholder-[#e6ded0]/70 text-white focus:outline-none focus:ring-2 focus:ring-[#d4af37]"
-              required
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-[#d4af37] text-[#382f21] font-montserrat text-sm uppercase tracking-wider hover:bg-[#e6ded0] transition-colors"
-            >
-              Subscribe
-            </button>
-          </form>
+          <TestimonialMarquee testimonials={testimonialsToDisplay} />
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 max-w-3xl">
+      <section className="py-10 md:py-160 bg-white">
+        <div className="container mx-auto px-4 max-w-3xl ">
           <SectionTitle title="Frequently Asked Questions" subtitle="Need help?" />
-
-          <FAQ faqs={faqData} />
+          <div className="mb-8 md:mt-0">
+            <FAQ faqs={faqData} />
+          </div>
         </div>
       </section>
     </div>

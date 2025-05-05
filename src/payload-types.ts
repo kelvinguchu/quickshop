@@ -301,18 +301,41 @@ export interface Order {
    * Unique order identifier
    */
   orderNumber: string;
-  customer: string | User;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  customer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  shippingAddress: {
+    address: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
   items: {
-    product: string | Product;
+    productId: string;
+    name: string;
+    price: number;
     quantity: number;
-    color: string;
-    size: string;
-    height?: string | null;
+    image?: string | null;
+    id?: string | null;
+  }[];
+  subtotal: number;
+  shippingFee?: number | null;
+  total: number;
+  status: 'pending' | 'processing' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  payment: {
+    method: 'card' | 'mpesa' | 'bank';
     /**
-     * Custom measurements provided by the customer
+     * Payment provider transaction ID
      */
-    customMeasurements?:
+    transactionId?: string | null;
+    status?: ('pending' | 'processing' | 'complete' | 'failed') | null;
+    /**
+     * Additional payment details from provider
+     */
+    details?:
       | {
           [k: string]: unknown;
         }
@@ -321,37 +344,7 @@ export interface Order {
       | number
       | boolean
       | null;
-    price: number;
-    id?: string | null;
-  }[];
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
-  shippingAddress: {
-    fullName: string;
-    addressLine1: string;
-    addressLine2?: string | null;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-    phone: string;
   };
-  billingAddress?: {
-    sameAsShipping?: boolean | null;
-    fullName?: string | null;
-    addressLine1?: string | null;
-    addressLine2?: string | null;
-    city?: string | null;
-    state?: string | null;
-    postalCode?: string | null;
-    country?: string | null;
-    phone?: string | null;
-  };
-  paymentMethod: 'credit-card' | 'bank-transfer' | 'cash-on-delivery';
-  paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
-  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -565,52 +558,44 @@ export interface ProductsSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   orderNumber?: T;
-  customer?: T;
-  status?: T;
-  items?:
+  customer?:
     | T
     | {
-        product?: T;
-        quantity?: T;
-        color?: T;
-        size?: T;
-        height?: T;
-        customMeasurements?: T;
-        price?: T;
-        id?: T;
+        firstName?: T;
+        lastName?: T;
+        email?: T;
+        phone?: T;
       };
-  subtotal?: T;
-  shipping?: T;
-  tax?: T;
-  total?: T;
   shippingAddress?:
     | T
     | {
-        fullName?: T;
-        addressLine1?: T;
-        addressLine2?: T;
+        address?: T;
         city?: T;
-        state?: T;
-        postalCode?: T;
         country?: T;
-        phone?: T;
+        postalCode?: T;
       };
-  billingAddress?:
+  items?:
     | T
     | {
-        sameAsShipping?: T;
-        fullName?: T;
-        addressLine1?: T;
-        addressLine2?: T;
-        city?: T;
-        state?: T;
-        postalCode?: T;
-        country?: T;
-        phone?: T;
+        productId?: T;
+        name?: T;
+        price?: T;
+        quantity?: T;
+        image?: T;
+        id?: T;
       };
-  paymentMethod?: T;
-  paymentStatus?: T;
-  notes?: T;
+  subtotal?: T;
+  shippingFee?: T;
+  total?: T;
+  status?: T;
+  payment?:
+    | T
+    | {
+        method?: T;
+        transactionId?: T;
+        status?: T;
+        details?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

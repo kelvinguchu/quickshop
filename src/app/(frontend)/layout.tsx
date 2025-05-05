@@ -7,9 +7,9 @@ import Footer from '@/components/layout/Footer'
 import { CartProvider } from '@/lib/cart/CartContext'
 
 export const metadata = {
-  title: 'QuickShop - Islamic Clothing',
+  title: 'QuickShop - Premium Qamis & Abaya Clothing',
   description:
-    'Premium Islamic clothing store featuring Qamis and Abaya collections with custom measurements',
+    'Premium Qamis & Abaya clothing store featuring Qamis and Abaya collections with custom measurements',
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="font-body bg-[#f9f6f2]">
         <CartProvider>
           <Navbar />
-          <main className="pt-[60px] md:pt-[76px]">{children}</main>
+          <main className="md:pt-[76px]">{children}</main>
           <Footer />
         </CartProvider>
       </body>

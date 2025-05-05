@@ -5,7 +5,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#382f21] text-[#f9f6f2] pt-12 pb-6">
+    <footer className="hidden md:block bg-[#382f21] text-[#f9f6f2] pt-12 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and About */}
@@ -14,8 +14,7 @@ export default function Footer() {
               QuickShop
             </Link>
             <p className="font-montserrat text-sm text-[#e6ded0] mt-4">
-              Premium Islamic clothing store featuring Qamis and Abaya collections with custom
-              measurements.
+              Premium clothing store featuring Qamis and Abaya collections with custom measurements.
             </p>
             <div className="flex space-x-4 pt-2">
               <a

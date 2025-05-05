@@ -37,7 +37,7 @@ const ProductViewWithColorSelection: React.FC<ProductViewWithColorSelectionProps
   }, [product, defaultColor])
 
   return (
-    <div className="flex flex-col md:flex-row gap-8">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-8 px-2 md:px-0">
       <ProductGallery
         mainImage={product.mainImage}
         additionalImages={additionalImages}
@@ -47,9 +47,11 @@ const ProductViewWithColorSelection: React.FC<ProductViewWithColorSelectionProps
       />
 
       <ProductDetails
+        id={product.id}
         name={product.name}
         price={product.price}
         description={product.description}
+        mainImage={product.mainImage}
         color={product.color}
         colorCode={product.colorCode}
         colorVariations={product.colorVariations}

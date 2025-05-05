@@ -12,7 +12,7 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { SubCategories } from './collections/SubCategories'
 import { Products } from './collections/Products'
-import { Orders } from './collections/Orders'
+import Orders from './collections/Orders'
 import { Testimonials } from './collections/Testimonials'
 
 const filename = fileURLToPath(import.meta.url)

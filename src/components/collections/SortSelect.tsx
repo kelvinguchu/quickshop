@@ -3,6 +3,13 @@
 import React from 'react'
 import Link from 'next/link'
 import { FaChevronDown } from 'react-icons/fa'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 
 interface SortSelectProps {
   category: string
@@ -21,29 +28,28 @@ export default function SortSelect({ category, subcategory, currentSort }: SortS
     { value: 'price-desc', label: 'Price: High to Low' },
   ]
 
+  const currentLabel = sortOptions.find((opt) => opt.value === currentSort)?.label || 'Latest'
+
   return (
-    <div className="relative group">
-      <button className="px-3 py-1 text-sm border border-gray-300 rounded-md flex items-center gap-2 bg-white">
-        <span>
-          Sort by: {sortOptions.find((opt) => opt.value === currentSort)?.label || 'Latest'}
-        </span>
-        <FaChevronDown className="w-2.5 h-2.5" />
-      </button>
-      <div className="absolute z-10 right-0 top-full mt-1 w-48 bg-white border border-gray-200 shadow-lg rounded-md hidden group-hover:block">
-        <div className="py-1">
-          {sortOptions.map((option) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="text-xs sm:text-sm whitespace-nowrap">
+          Sort by: {currentLabel}
+          <FaChevronDown className="ml-1 h-2 w-2 sm:ml-1.5 sm:h-2.5 sm:w-2.5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40 sm:w-48 z-50">
+        {sortOptions.map((option) => (
+          <DropdownMenuItem key={option.value} asChild>
             <Link
-              key={option.value}
               href={`${basePath}${option.value === 'latest' ? '' : `?sort=${option.value}`}`}
-              className={`block px-4 py-2 text-sm ${
-                currentSort === option.value ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
-              }`}
+              className={`w-full ${currentSort === option.value ? 'font-medium bg-accent' : ''}`}
             >
               {option.label}
             </Link>
-          ))}
-        </div>
-      </div>
-    </div>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

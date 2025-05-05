@@ -97,28 +97,29 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
   const currentMainImage = activeImageUrl || displayImages[0]?.url || null
 
   return (
-    <div className="w-full md:w-1/2">
+    <div className="w-full md:w-1/2 space-y-3 md:space-y-4">
       {/* Main Product Image */}
-      <div className="relative pt-10 aspect-square overflow-hidden bg-gray-50 mb-4 border border-gray-100 rounded-md">
+      <div className="relative pt-6 md:pt-10 aspect-square overflow-hidden bg-gray-50 border border-gray-100 rounded-md">
         {currentMainImage ? (
           <Image
             src={currentMainImage}
             alt={productName}
             fill
-            className="object-contain" // Changed from object-cover to object-contain to prevent zoomed out issues
+            className="object-contain"
             sizes="(max-width: 768px) 100vw, 50vw"
+            priority
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400">No image</span>
+            <span className="text-gray-400 text-sm">No image</span>
           </div>
         )}
       </div>
 
       {/* Thumbnail Gallery - Only show if we have additional unique images */}
       {displayImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
-          {displayImages.slice(0, 4).map((image, index) => (
+        <div className="grid grid-cols-5 sm:grid-cols-4 gap-1 sm:gap-2">
+          {displayImages.slice(0, 5).map((image, index) => (
             <div
               key={index}
               className={`relative aspect-square overflow-hidden border rounded-md cursor-pointer ${
@@ -132,8 +133,8 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                 src={image.url}
                 alt={image.alt || `${productName} - view ${index + 1}`}
                 fill
-                className="object-contain" // Changed from object-cover to object-contain
-                sizes="25vw"
+                className="object-contain p-1"
+                sizes="(max-width: 640px) 20vw, 12.5vw"
               />
             </div>
           ))}

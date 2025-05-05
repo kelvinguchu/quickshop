@@ -138,13 +138,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       : []
 
   return (
-    <div className="w-full bg-white mt-8">
+    <div className="w-full bg-white md:mt-8">
       <Breadcrumb productName={product.name} category={product.category} />
 
       <div className="container mx-auto mt-10 px-4 py-8">
         <ProductViewWithColorSelection product={product} additionalImages={additionalImages} />
-
-        <RelatedProducts products={relatedProducts.docs} />
+        <div className="pb-24 md:pb-0">
+          <RelatedProducts products={relatedProducts.docs} />
+        </div>
       </div>
     </div>
   )
