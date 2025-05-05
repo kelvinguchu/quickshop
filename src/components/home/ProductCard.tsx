@@ -66,9 +66,9 @@ export default function ProductCard({
     imageSource = product.mainImage.url ?? undefined;
   }
 
-  if (!imageSource) {
-    imageSource = product.staticImage;
-  }
+  // Provide a default placeholder if no image source is found
+  const finalImageSource =
+    imageSource || product.staticImage || "/placeholder-product.jpg"; // Ensure a string is always provided
 
   // Check if the product is in wishlist and cart when component mounts or cart/wishlist changes
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function ProductCard({
       <Link href={`/products/${product.id}`} className='block'>
         <div className='relative aspect-[4/5] w-full overflow-hidden bg-[#f9f6f2]'>
           <Image
-            src={imageSource}
+            src={finalImageSource}
             alt={product.name}
             fill
             sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
