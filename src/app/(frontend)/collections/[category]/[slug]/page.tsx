@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
-import { Subcategory, Product } from "@/payload-types";
+import {
+  Subcategory,
+  Product,
+  SubcategoriesSelect,
+  ProductsSelect,
+} from "@/payload-types";
 import type { PaginatedDocs } from "payload";
 
 export async function generateMetadata({
@@ -159,7 +164,10 @@ export default async function SubcategoryPage({
 
   try {
     // Fetch all subcategories for the current category (siblings)
-    siblingSubcategories = await payload.find<"subcategories", Subcategory>({
+    siblingSubcategories = await payload.find<
+      "subcategories",
+      SubcategoriesSelect<true>
+    >({
       collection: "subcategories",
       where: {
         category: {
@@ -190,8 +198,10 @@ export default async function SubcategoryPage({
       limit: 12,
     };
 
-    // Fetch products with explicit generic type
-    products = await payload.find<"products", Product>(productsQuery);
+    // Fetch products with explicit generic select
+    products = await payload.find<"products", ProductsSelect<true>>(
+      productsQuery
+    );
   } catch (error) {
     console.error("Error fetching products:", error);
   }
