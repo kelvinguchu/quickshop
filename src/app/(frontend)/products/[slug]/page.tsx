@@ -64,7 +64,7 @@ export async function generateMetadata({
       ) {
         // Extract text from the richText structure
         descriptionText = (descUnknown as any).root.children
-          .map((node) => {
+          .map((node: any) => {
             // Try to extract text from paragraph nodes
             if (node.children && Array.isArray(node.children)) {
               return node.children
