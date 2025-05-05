@@ -15,9 +15,11 @@ interface ProductCardProps {
     slug?: string;
     name: string;
     price: number;
-    mainImage?: {
-      url: string;
-    };
+    mainImage?:
+      | string
+      | {
+          url: string;
+        };
     staticImage?: string;
   };
   imageWidth?: number;
@@ -55,7 +57,17 @@ export default function ProductCard({
   const [wishlistConfetti, setWishlistConfetti] = useState<ConfettiEmoji[]>([]);
 
   // Handle image source (either from CMS or static folder)
-  const imageSource = product.mainImage?.url ?? product.staticImage;
+  let imageSource: string | undefined;
+
+  if (typeof product.mainImage === "string") {
+    imageSource = product.mainImage;
+  } else if (product.mainImage && typeof product.mainImage === "object") {
+    imageSource = product.mainImage.url;
+  }
+
+  if (!imageSource) {
+    imageSource = product.staticImage;
+  }
 
   // Check if the product is in wishlist and cart when component mounts or cart/wishlist changes
   useEffect(() => {
