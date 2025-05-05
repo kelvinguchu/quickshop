@@ -88,7 +88,7 @@ export default function Hero() {
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Slides */}
+      {/* Slides */}
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0 }}
@@ -173,8 +173,8 @@ export default function Hero() {
                   <span className="relative z-10 flex items-center transition-transform duration-300 group-hover:translate-x-1">
                     {slides[currentSlide].ctaText}
                     <FaArrowRight className="ml-2 sm:ml-3 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                </Link>
+                </span>
+              </Link>
               </motion.div>
             </motion.div>
           </div>
@@ -183,12 +183,12 @@ export default function Hero() {
 
       {/* Navigation controls */}
       <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 flex items-center">
-        <button
-          onClick={prevSlide}
+      <button
+        onClick={prevSlide}
           className="mx-2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/40 transition-all duration-300 backdrop-blur-sm"
-          aria-label="Previous slide"
-          disabled={isTransitioning}
-        >
+        aria-label="Previous slide"
+        disabled={isTransitioning}
+      >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -203,20 +203,20 @@ export default function Hero() {
           >
             <path d="m15 18-6-6 6-6" />
           </svg>
-        </button>
+      </button>
 
         <div className="flex space-x-2 sm:space-x-3">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              disabled={isTransitioning}
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            disabled={isTransitioning}
               className="relative h-3 w-3"
               aria-label={`Go to slide ${index + 1}`}
             >
               <span
                 className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                  currentSlide === index
+              currentSlide === index
                     ? 'bg-[#d4af37] scale-100'
                     : 'bg-white/50 scale-75 hover:scale-90 hover:bg-white/70'
                 }`}

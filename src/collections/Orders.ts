@@ -1,10 +1,10 @@
-import { CollectionConfig } from 'payload/types'
+import type { CollectionConfig } from "payload";
 
 const Orders: CollectionConfig = {
-  slug: 'orders',
+  slug: "orders",
   admin: {
-    useAsTitle: 'orderNumber',
-    defaultColumns: ['orderNumber', 'customer', 'total', 'status', 'createdAt'],
+    useAsTitle: "orderNumber",
+    defaultColumns: ["orderNumber", "customer", "total", "status", "createdAt"],
   },
   access: {
     read: () => true,
@@ -13,208 +13,208 @@ const Orders: CollectionConfig = {
   },
   fields: [
     {
-      name: 'orderNumber',
-      type: 'text',
+      name: "orderNumber",
+      type: "text",
       required: true,
       admin: {
-        description: 'Unique order identifier',
+        description: "Unique order identifier",
       },
     },
     {
-      name: 'customer',
-      type: 'group',
+      name: "customer",
+      type: "group",
       fields: [
         {
-          name: 'firstName',
-          type: 'text',
+          name: "firstName",
+          type: "text",
           required: true,
         },
         {
-          name: 'lastName',
-          type: 'text',
+          name: "lastName",
+          type: "text",
           required: true,
         },
         {
-          name: 'email',
-          type: 'email',
+          name: "email",
+          type: "email",
           required: true,
         },
         {
-          name: 'phone',
-          type: 'text',
+          name: "phone",
+          type: "text",
           required: true,
         },
       ],
     },
     {
-      name: 'shippingAddress',
-      type: 'group',
+      name: "shippingAddress",
+      type: "group",
       fields: [
         {
-          name: 'address',
-          type: 'text',
+          name: "address",
+          type: "text",
           required: true,
         },
         {
-          name: 'city',
-          type: 'text',
+          name: "city",
+          type: "text",
           required: true,
         },
         {
-          name: 'country',
-          type: 'text',
+          name: "country",
+          type: "text",
           required: true,
         },
         {
-          name: 'postalCode',
-          type: 'text',
+          name: "postalCode",
+          type: "text",
           required: true,
         },
       ],
     },
     {
-      name: 'items',
-      type: 'array',
+      name: "items",
+      type: "array",
       required: true,
       fields: [
         {
-          name: 'productId',
-          type: 'text',
+          name: "productId",
+          type: "text",
           required: true,
         },
         {
-          name: 'name',
-          type: 'text',
+          name: "name",
+          type: "text",
           required: true,
         },
         {
-          name: 'price',
-          type: 'number',
+          name: "price",
+          type: "number",
           required: true,
         },
         {
-          name: 'quantity',
-          type: 'number',
+          name: "quantity",
+          type: "number",
           required: true,
           min: 1,
         },
         {
-          name: 'image',
-          type: 'text',
+          name: "image",
+          type: "text",
         },
       ],
     },
     {
-      name: 'subtotal',
-      type: 'number',
+      name: "subtotal",
+      type: "number",
       required: true,
     },
     {
-      name: 'shippingFee',
-      type: 'number',
+      name: "shippingFee",
+      type: "number",
       defaultValue: 0,
     },
     {
-      name: 'total',
-      type: 'number',
+      name: "total",
+      type: "number",
       required: true,
     },
     {
-      name: 'status',
-      type: 'select',
+      name: "status",
+      type: "select",
       required: true,
-      defaultValue: 'pending',
+      defaultValue: "pending",
       options: [
         {
-          label: 'Pending',
-          value: 'pending',
+          label: "Pending",
+          value: "pending",
         },
         {
-          label: 'Processing',
-          value: 'processing',
+          label: "Processing",
+          value: "processing",
         },
         {
-          label: 'Paid',
-          value: 'paid',
+          label: "Paid",
+          value: "paid",
         },
         {
-          label: 'Shipped',
-          value: 'shipped',
+          label: "Shipped",
+          value: "shipped",
         },
         {
-          label: 'Delivered',
-          value: 'delivered',
+          label: "Delivered",
+          value: "delivered",
         },
         {
-          label: 'Cancelled',
-          value: 'cancelled',
+          label: "Cancelled",
+          value: "cancelled",
         },
       ],
     },
     {
-      name: 'payment',
-      type: 'group',
+      name: "payment",
+      type: "group",
       fields: [
         {
-          name: 'method',
-          type: 'select',
+          name: "method",
+          type: "select",
           required: true,
           options: [
             {
-              label: 'Card Payment',
-              value: 'card',
+              label: "Card Payment",
+              value: "card",
             },
             {
-              label: 'M-Pesa',
-              value: 'mpesa',
+              label: "M-Pesa",
+              value: "mpesa",
             },
             {
-              label: 'Bank Transfer',
-              value: 'bank',
+              label: "Bank Transfer",
+              value: "bank",
             },
           ],
         },
         {
-          name: 'transactionId',
-          type: 'text',
+          name: "transactionId",
+          type: "text",
           admin: {
-            description: 'Payment provider transaction ID',
+            description: "Payment provider transaction ID",
           },
         },
         {
-          name: 'status',
-          type: 'select',
-          defaultValue: 'pending',
+          name: "status",
+          type: "select",
+          defaultValue: "pending",
           options: [
             {
-              label: 'Pending',
-              value: 'pending',
+              label: "Pending",
+              value: "pending",
             },
             {
-              label: 'Processing',
-              value: 'processing',
+              label: "Processing",
+              value: "processing",
             },
             {
-              label: 'Complete',
-              value: 'complete',
+              label: "Complete",
+              value: "complete",
             },
             {
-              label: 'Failed',
-              value: 'failed',
+              label: "Failed",
+              value: "failed",
             },
           ],
         },
         {
-          name: 'details',
-          type: 'json',
+          name: "details",
+          type: "json",
           admin: {
-            description: 'Additional payment details from provider',
+            description: "Additional payment details from provider",
           },
         },
       ],
     },
   ],
   timestamps: true,
-}
+};
 
-export default Orders
+export default Orders;
