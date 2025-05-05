@@ -47,7 +47,7 @@ export default function TestimonialMarquee({
     <div className='w-full py-4'>
       <Marquee
         gradient={true}
-        gradientColor={[249, 246, 242]} // RGB for #f9f6f2
+        gradientColor='rgb(249, 246, 242)'
         gradientWidth={50}
         speed={40}
         pauseOnHover={true}>
