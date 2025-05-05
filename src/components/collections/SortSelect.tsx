@@ -39,7 +39,7 @@ export default function SortSelect({ category, subcategory, currentSort }: SortS
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40 sm:w-48 z-50">
-        {sortOptions.map((option) => (
+          {sortOptions.map((option) => (
           <DropdownMenuItem key={option.value} asChild>
             <Link
               href={`${basePath}${option.value === 'latest' ? '' : `?sort=${option.value}`}`}
@@ -48,7 +48,7 @@ export default function SortSelect({ category, subcategory, currentSort }: SortS
               {option.label}
             </Link>
           </DropdownMenuItem>
-        ))}
+          ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -43,3 +43,9 @@ next-env.d.ts
 /media
 
 aboutapp.md
+
+# PWA files
+/public/workbox-*.js
+/public/sw.js
+/public/worker-*.js
+/public/fallback-*.js

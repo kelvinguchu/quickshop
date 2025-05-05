@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Heart, ShoppingBag, User, ChevronDown } from 'lucide-react'
+import {
+  Search,
+  Heart,
+  ShoppingBag,
+  User,
+  ChevronDown,
+  Instagram,
+  Facebook,
+  Twitter,
+} from 'lucide-react'
 import { useCart } from '@/lib/cart/CartContext'
 import { useWishlistStore } from '@/lib/wishlist/wishlistStore'
 import { WishlistSheet } from '@/components/wishlist/WishlistSheet'
@@ -154,26 +163,44 @@ export default function Navbar() {
         className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 border-b border-[#e6ded0]/60 hidden md:block
         ${isScrolled ? 'bg-white shadow-md' : 'bg-white'}`}
       >
-        <div className="max-w-[1280px] mx-auto px-4">
+        <div className="w-full">
           {/* Top Bar */}
-          <div className="flex justify-between items-center border-b border-[#e6ded0]/60 py-2 text-xs text-[#8a7d65]">
-            <div className="flex items-center space-x-6 font-montserrat uppercase tracking-wider">
-              <span>Free shipping on orders over $200</span>
-              <span>24/7 Customer Service</span>
+          <div className="flex justify-between items-center border-b border-[#e6ded0]/60 py-2 text-xs bg-[#382f21] px-4 text-white">
+            <div className="flex items-center space-x-4 font-montserrat">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#d4af37] transition-colors"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#d4af37] transition-colors"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#d4af37] transition-colors"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
             </div>
             <div className="flex items-center space-x-4 font-montserrat">
-              <Link href="/about" className="hover:text-[#382f21] transition-colors">
-                About Us
-              </Link>
+              <span>Call: +254 700 123 456</span>
               <span>|</span>
-              <Link href="/contact" className="hover:text-[#382f21] transition-colors">
-                Contact
-              </Link>
+              <span>Email: info@quickshop.co.ke</span>
             </div>
           </div>
 
           {/* Main Navbar */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between px-4 py-3">
             {/* Logo */}
             <Link href="/" className="relative z-10">
               <div className="flex items-center">

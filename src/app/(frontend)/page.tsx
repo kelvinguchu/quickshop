@@ -354,7 +354,7 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-10 md:py-160 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4 max-w-3xl ">
           <SectionTitle title="Frequently Asked Questions" subtitle="Need help?" />
           <div className="mb-8 md:mt-0">
