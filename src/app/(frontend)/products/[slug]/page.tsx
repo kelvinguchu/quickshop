@@ -180,7 +180,7 @@ export default async function ProductPage({
           additionalImages={additionalImages}
         />
         <div className='pb-24 md:pb-0'>
-          <RelatedProducts products={relatedProducts.docs} />
+          <RelatedProducts products={relatedProducts.docs as any} />
         </div>
       </div>
     </div>
