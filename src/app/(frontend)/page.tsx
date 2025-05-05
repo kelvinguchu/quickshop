@@ -15,7 +15,7 @@ import type { Category, Product, Testimonial } from "@/payload-types";
 import Hero from "@/components/home/Hero";
 import SectionTitle from "@/components/home/SectionTitle";
 import ProductCard from "@/components/home/ProductCard";
-import CategoryCard from "@/components/home/CategoryCard";
+import CategoryCard, { CategoryCardData } from "@/components/home/CategoryCard";
 import TestimonialMarquee from "@/components/home/TestimonialMarquee";
 import FAQ from "@/components/home/FAQ";
 
@@ -268,7 +268,7 @@ export default async function HomePage() {
   }
 
   // Add custom category directly to the display list, no static fallbacks
-  const customCategory = {
+  const customCategory: CategoryCardData = {
     id: "custom",
     name: "Custom Made",
     slug: "custom",
@@ -276,7 +276,10 @@ export default async function HomePage() {
     isCustom: true,
   };
 
-  const categoriesToDisplay = [...featuredCategories.docs, customCategory];
+  const categoriesToDisplay: CategoryCardData[] = [
+    ...(featuredCategories.docs as CategoryCardData[]),
+    customCategory,
+  ];
 
   // Use CMS data directly without static fallbacks for products
   const abayasToDisplay = trendingAbayas.docs;

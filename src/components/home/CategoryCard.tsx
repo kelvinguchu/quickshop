@@ -4,12 +4,16 @@ import { FaArrowRight } from "react-icons/fa";
 
 import type { Category as PayloadCategory, Media } from "@/payload-types";
 
-// Allow any category plus optional custom fields
-type CategoryCardData = PayloadCategory & {
-  staticImage?: string;
-  isCustom?: boolean;
+export type CustomCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  staticImage: string;
+  isCustom: boolean;
   parentCategory?: string;
 };
+
+export type CategoryCardData = PayloadCategory | CustomCategory;
 
 interface CategoryCardProps {
   category: CategoryCardData;
@@ -19,7 +23,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   // Determine image source
   let imageSource: string | undefined;
 
-  if ("image" in category) {
+  if ("image" in category && category.image !== undefined) {
     const img = (category as PayloadCategory).image as string | Media;
     if (typeof img === "string") {
       imageSource = img;
@@ -33,14 +37,14 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   }
 
   // Create the link URL based on available data
-  const linkUrl = category.isCustom
+  const linkUrl = (category as CustomCategory).isCustom
     ? "/custom"
-    : category.parentCategory
-      ? `/collections/${category.parentCategory}/${category.slug}`
+    : (category as CustomCategory).parentCategory
+      ? `/collections/${(category as CustomCategory).parentCategory}/${category.slug}`
       : `/collections/${category.slug || category.id}`;
 
   // Custom button text based on category type
-  const buttonText = category.isCustom
+  const buttonText = (category as CustomCategory).isCustom
     ? "Get Custom Order"
     : "Explore Collection";
 
