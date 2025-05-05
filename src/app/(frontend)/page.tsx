@@ -10,6 +10,8 @@ import {
 } from "react-icons/fa";
 
 import config from "@/payload.config";
+import type { PaginatedDocs } from "payload";
+import type { Category, Product, Testimonial } from "@/payload-types";
 import Hero from "@/components/home/Hero";
 import SectionTitle from "@/components/home/SectionTitle";
 import ProductCard from "@/components/home/ProductCard";
@@ -113,11 +115,58 @@ export default async function HomePage() {
   const payloadConfig = await config;
   const payload = await getPayload({ config: payloadConfig });
 
-  // Initialize with empty data in case of errors
-  let featuredCategories = { docs: [] };
-  let trendingAbayas = { docs: [] };
-  let trendingQamis = { docs: [] };
-  let testimonials = { docs: [] };
+  // Initialize with empty data in case of errors (typed as PaginatedDocs<...>)
+  let featuredCategories: PaginatedDocs<Category> = {
+    docs: [],
+    totalDocs: 0,
+    limit: 0,
+    page: 1,
+    pagingCounter: 0,
+    totalPages: 0,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
+  };
+
+  let trendingAbayas: PaginatedDocs<Product> = {
+    docs: [],
+    totalDocs: 0,
+    limit: 0,
+    page: 1,
+    pagingCounter: 0,
+    totalPages: 0,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
+  };
+
+  let trendingQamis: PaginatedDocs<Product> = {
+    docs: [],
+    totalDocs: 0,
+    limit: 0,
+    page: 1,
+    pagingCounter: 0,
+    totalPages: 0,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
+  };
+
+  let testimonials: PaginatedDocs<Testimonial> = {
+    docs: [],
+    totalDocs: 0,
+    limit: 0,
+    page: 1,
+    pagingCounter: 0,
+    totalPages: 0,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
+  };
 
   try {
     // Fetch featured categories
