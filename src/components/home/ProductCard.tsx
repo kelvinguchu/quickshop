@@ -18,8 +18,9 @@ interface ProductCardProps {
     mainImage?:
       | string
       | {
-          url: string;
-        };
+          url?: string | null;
+        }
+      | null;
     staticImage?: string;
   };
   imageWidth?: number;
@@ -62,7 +63,7 @@ export default function ProductCard({
   if (typeof product.mainImage === "string") {
     imageSource = product.mainImage;
   } else if (product.mainImage && typeof product.mainImage === "object") {
-    imageSource = product.mainImage.url;
+    imageSource = product.mainImage.url ?? undefined;
   }
 
   if (!imageSource) {
