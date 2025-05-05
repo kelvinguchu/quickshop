@@ -68,8 +68,8 @@ export async function generateMetadata({
             // Try to extract text from paragraph nodes
             if (node.children && Array.isArray(node.children)) {
               return node.children
-                .filter((child) => child.text)
-                .map((child) => child.text)
+                .filter((child: any) => child.text)
+                .map((child: any) => child.text)
                 .join(" ");
             }
             return "";
