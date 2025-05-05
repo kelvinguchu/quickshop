@@ -181,13 +181,11 @@ export default async function SubcategoryPage({
   }
 
   try {
-    // Build the query for products
-    const productsQuery = {
+    // Fetch products directly with literal query object to satisfy generic constraint
+    products = await payload.find<"products", ProductsSelect<true>>({
       collection: "products",
       where: {
-        subcategory: {
-          equals: subcategoryId,
-        },
+        subcategory: { equals: subcategoryId },
       },
       sort:
         sort === "price-desc"
@@ -196,12 +194,7 @@ export default async function SubcategoryPage({
             ? "price"
             : "-createdAt",
       limit: 12,
-    };
-
-    // Fetch products with explicit generic select
-    products = await payload.find<"products", ProductsSelect<true>>(
-      productsQuery
-    );
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
   }
