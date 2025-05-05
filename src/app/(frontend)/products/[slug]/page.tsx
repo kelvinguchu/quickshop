@@ -20,6 +20,11 @@ const ProductViewWithColorSelection = dynamic(
   { ssr: true }
 );
 
+// Extend Product type to include optional images array (if present)
+type ProductWithImages = Product & {
+  images?: { url: string }[];
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -49,7 +54,7 @@ export async function generateMetadata({
       };
     }
 
-    const product = productQuery.docs[0];
+    const product = productQuery.docs[0] as ProductWithImages;
 
     // Handle description properly, as it's a richText field
     let descriptionText = "";
@@ -119,7 +124,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const product = productQuery.docs[0];
+  const product = productQuery.docs[0] as ProductWithImages;
 
   // Fetch related products (same category)
   let relatedProducts: PaginatedDocs<Product> = {
@@ -161,10 +166,9 @@ export default async function ProductPage({
   }
 
   // Fetch additional product images if they exist
-  const additionalImages =
-    product.images && Array.isArray(product.images)
-      ? product.images.map((img) => ({ url: img.url, alt: product.name }))
-      : [];
+  const additionalImages = Array.isArray(product.images)
+    ? product.images.map((img) => ({ url: img.url, alt: product.name }))
+    : [];
 
   return (
     <div className='w-full bg-white md:mt-8'>
