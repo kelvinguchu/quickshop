@@ -16,7 +16,9 @@ import Hero from "@/components/home/Hero";
 import SectionTitle from "@/components/home/SectionTitle";
 import ProductCard from "@/components/home/ProductCard";
 import CategoryCard, { CategoryCardData } from "@/components/home/CategoryCard";
-import TestimonialMarquee from "@/components/home/TestimonialMarquee";
+import TestimonialMarquee, {
+  Testimonial as MarqueeTestimonial,
+} from "@/components/home/TestimonialMarquee";
 import FAQ from "@/components/home/FAQ";
 
 // Static data for FAQs
@@ -286,8 +288,10 @@ export default async function HomePage() {
   const qamisToDisplay = trendingQamis.docs;
 
   // Use static testimonials as fallback
-  const testimonialsToDisplay =
-    testimonials.docs.length > 0 ? testimonials.docs : staticTestimonials;
+  const testimonialsToDisplay: MarqueeTestimonial[] =
+    testimonials.docs.length > 0
+      ? (testimonials.docs as unknown as MarqueeTestimonial[])
+      : staticTestimonials;
 
   return (
     <div>
