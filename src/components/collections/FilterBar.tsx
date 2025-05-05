@@ -43,7 +43,15 @@ export default function FilterBar({
 }: FilterBarProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState({
+
+  interface FiltersState {
+    sizes: string[];
+    featured: boolean;
+    trending: boolean;
+    sort: string;
+  }
+
+  const [selectedFilters, setSelectedFilters] = useState<FiltersState>({
     sizes: [],
     featured: false,
     trending: false,
@@ -56,7 +64,7 @@ export default function FilterBar({
 
   const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
 
-  const toggleSize = (size) => {
+  const toggleSize = (size: string) => {
     setSelectedFilters((prev) => {
       const sizes = [...prev.sizes];
       const index = sizes.indexOf(size);
@@ -83,10 +91,10 @@ export default function FilterBar({
     }));
   };
 
-  const setSort = (sort) => {
+  const setSort = (sortValue: string) => {
     setSelectedFilters((prev) => ({
       ...prev,
-      sort,
+      sort: sortValue,
     }));
   };
 
