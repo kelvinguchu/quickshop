@@ -1,6 +1,8 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import type { PaginatedDocs } from "payload";
+import type { Product } from "@/payload-types";
 import config from "@/payload.config";
 
 // Import our components
@@ -120,7 +122,18 @@ export default async function ProductPage({
   const product = productQuery.docs[0];
 
   // Fetch related products (same category)
-  let relatedProducts = { docs: [] };
+  let relatedProducts: PaginatedDocs<Product> = {
+    docs: [],
+    totalDocs: 0,
+    limit: 0,
+    page: 1,
+    pagingCounter: 0,
+    totalPages: 0,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
+  };
   try {
     relatedProducts = await payload.find({
       collection: "products",
