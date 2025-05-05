@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
-import { Subcategory } from "@/payload-types";
+import { Subcategory, Product } from "@/payload-types";
 
 export async function generateMetadata({
   params,
@@ -132,7 +132,10 @@ export default async function SubcategoryPage({
 
   // Initialize with empty data
   let siblingSubcategories: { docs: Subcategory[] } = { docs: [] };
-  let products = { docs: [], totalDocs: 0 };
+  let products: { docs: Product[]; totalDocs: number } = {
+    docs: [],
+    totalDocs: 0,
+  };
 
   try {
     // Fetch all subcategories for the current category (siblings)
