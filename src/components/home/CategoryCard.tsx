@@ -33,20 +33,25 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   }
 
   if (!imageSource) {
-    imageSource = category.staticImage ?? "/placeholder-category.jpg";
+    imageSource =
+      "staticImage" in category && category.staticImage
+        ? category.staticImage
+        : "/placeholder-category.jpg";
   }
 
   // Create the link URL based on available data
-  const linkUrl = (category as CustomCategory).isCustom
+  const isCustom = "isCustom" in category && category.isCustom;
+  const parentCat =
+    "parentCategory" in category ? category.parentCategory : undefined;
+
+  const linkUrl = isCustom
     ? "/custom"
-    : (category as CustomCategory).parentCategory
-      ? `/collections/${(category as CustomCategory).parentCategory}/${category.slug}`
+    : parentCat
+      ? `/collections/${parentCat}/${category.slug}`
       : `/collections/${category.slug || category.id}`;
 
   // Custom button text based on category type
-  const buttonText = (category as CustomCategory).isCustom
-    ? "Get Custom Order"
-    : "Explore Collection";
+  const buttonText = isCustom ? "Get Custom Order" : "Explore Collection";
 
   return (
     <div className='group relative overflow-hidden rounded-sm'>
