@@ -4,7 +4,7 @@ import { getPayload } from "payload";
 import config from "@/payload.config";
 import SubcategoryDisplay from "@/components/collections/SubcategoryDisplay";
 import { Subcategory, Product } from "@/payload-types";
-import type { PaginatedDocs } from "payload/types";
+import type { PaginatedDocs } from "payload";
 
 export async function generateMetadata({
   params,
