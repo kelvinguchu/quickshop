@@ -5,30 +5,7 @@ import { TbBoxOff } from "react-icons/tb";
 import ProductCard from "@/components/home/ProductCard";
 import FilterBar from "./FilterBar";
 
-interface Subcategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  bannerImage?: {
-    url: string;
-  };
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  mainImage?: {
-    url: string;
-  };
-}
+import type { Subcategory, Category, Product } from "@/payload-types";
 
 interface SubcategoryDisplayProps {
   category: Category;
