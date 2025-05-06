@@ -152,7 +152,7 @@ export function CheckoutForm() {
     // Initialize IntaSend
     const intaSend = new window.IntaSend({
       publicAPIKey: process.env.NEXT_PUBLIC_INTASEND_PUBLIC_KEY,
-      live: true,
+      live: false,
     })
 
     intaSend
