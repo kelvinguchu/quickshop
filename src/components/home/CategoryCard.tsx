@@ -23,20 +23,24 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   // Determine image source
   let imageSource: string | undefined;
 
-  if ("image" in category && category.image !== undefined) {
-    const img = (category as PayloadCategory).image as string | Media;
-    if (typeof img === "string") {
-      imageSource = img;
-    } else if (img && typeof img === "object") {
-      imageSource = img.url ?? undefined;
-    }
+  // Only use the URL if the image field is populated (is an object with a url)
+  if (
+    "image" in category &&
+    category.image &&
+    typeof category.image === "object" &&
+    "url" in category.image
+  ) {
+    imageSource = category.image.url ?? undefined;
   }
 
+  // Fallback to staticImage if imageSource is still undefined
+  if (!imageSource && "staticImage" in category && category.staticImage) {
+    imageSource = category.staticImage;
+  }
+
+  // Final fallback to a default image
   if (!imageSource) {
-    imageSource =
-      "staticImage" in category && category.staticImage
-        ? category.staticImage
-        : "/placeholder-category.jpg";
+    imageSource = "/abayas/abaya1.webp"; // Default fallback
   }
 
   // Create the link URL based on available data

@@ -60,15 +60,23 @@ export default function ProductCard({
   // Handle image source (either from CMS or static folder)
   let imageSource: string | undefined;
 
-  if (typeof product.mainImage === "string") {
-    imageSource = product.mainImage;
-  } else if (product.mainImage && typeof product.mainImage === "object") {
-    imageSource = product.mainImage.url ?? undefined;
+  // Only use the URL if mainImage is populated (is an object with a url)
+  if (
+    product.mainImage &&
+    typeof product.mainImage === "object" &&
+    "url" in product.mainImage &&
+    product.mainImage.url
+  ) {
+    imageSource = product.mainImage.url;
   }
 
-  // Provide a default placeholder if no image source is found
-  const finalImageSource =
-    imageSource || product.staticImage || "/placeholder-product.jpg"; // Ensure a string is always provided
+  // Fallback to staticImage if imageSource is still undefined
+  if (!imageSource && product.staticImage) {
+    imageSource = product.staticImage;
+  }
+
+  // Provide a default placeholder if no image source is found after checks
+  const finalImageSource = imageSource || "/placeholder-product.jpg";
 
   // Check if the product is in wishlist and cart when component mounts or cart/wishlist changes
   useEffect(() => {
