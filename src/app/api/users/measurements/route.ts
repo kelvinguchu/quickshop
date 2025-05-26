@@ -50,10 +50,10 @@ async function validateMeasurementData(
 
   for (const measurement of measurements) {
     const numValue = Number(measurement.value);
-    if (isNaN(numValue) || numValue < 0 || numValue > 300) {
+    if (isNaN(numValue) || numValue <= 0 || numValue > 300) {
       return {
         error: {
-          message: `Invalid ${measurement.name} measurement for ${category}. Must be a number between 0 and 300 cm.`,
+          message: `Invalid ${measurement.name} measurement for ${category}. Must be a positive number between 1 and 300 cm.`,
           status: 400,
         },
       };
