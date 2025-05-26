@@ -29,11 +29,6 @@ export function CustomerInfoSection({
       <h3 className='font-cinzel text-sm md:text-lg text-[#382f21] mb-4 flex items-center gap-2'>
         <User className='h-4 w-4' />
         Customer Information
-        {user && (
-          <span className='text-xs text-green-600 bg-green-50 px-2 py-1 rounded-sm ml-auto'>
-            Pre-filled from account
-          </span>
-        )}
       </h3>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
