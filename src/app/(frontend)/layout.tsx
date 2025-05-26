@@ -7,6 +7,8 @@ import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/lib/cart/CartContext";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import { AuthSyncWrapper } from "@/components/auth/AuthSyncWrapper";
+import { NavigationLoadingProvider } from "@/components/providers/NavigationLoadingProvider";
+import { Toaster } from "@/components/ui/sonner";
 import { getPayload } from "payload";
 import config from "@/payload.config";
 import type { Metadata, Viewport } from "next";
@@ -115,11 +117,14 @@ export default async function RootLayout({
       <body className='font-body bg-[#f9f6f2]'>
         <AuthProvider>
           <CartProvider>
-            <AuthSyncWrapper>
-              <Navbar categories={categories} />
-              <main className='md:pt-[76px]'>{children}</main>
-              <Footer />
-            </AuthSyncWrapper>
+            <NavigationLoadingProvider>
+              <AuthSyncWrapper>
+                <Navbar categories={categories} />
+                <main className='md:pt-[76px]'>{children}</main>
+                <Footer />
+              </AuthSyncWrapper>
+              <Toaster />
+            </NavigationLoadingProvider>
           </CartProvider>
         </AuthProvider>
       </body>

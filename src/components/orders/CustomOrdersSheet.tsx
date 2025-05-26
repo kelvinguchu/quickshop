@@ -214,11 +214,11 @@ export function CustomOrdersSheet({
             No custom orders yet
           </h3>
           <p className='text-[#8a7d65] text-sm mb-4'>
-            Your custom measurement orders will appear here
+            Custom measurement orders will appear here
           </p>
           <a
             href='/custom'
-            className='inline-block bg-[#382f21] text-white px-4 py-2 rounded-sm font-montserrat text-sm uppercase tracking-wider hover:bg-[#4e4538] transition-colors'>
+            className='inline-block bg-transparent text-[#382f21] border border-[#382f21] px-4 py-2 rounded-sm font-montserrat text-sm uppercase tracking-wider hover:bg-[#4e4538] transition-colors'>
             Browse Custom Items
           </a>
         </div>
