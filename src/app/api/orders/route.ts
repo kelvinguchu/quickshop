@@ -1,5 +1,5 @@
 import { getPayload } from "payload";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import config from "@/payload.config";
 
 // Generate a unique order number
@@ -21,14 +21,14 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Map payment method from IntaSend to our internal format if needed
-    let paymentMethod = body.payment?.method || "card"; // Default to card
+    let paymentMethod = body.payment?.method ?? "card"; 
     if (paymentMethod) {
       if (paymentMethod.toLowerCase().includes("mpesa")) {
         paymentMethod = "mpesa";
       } else if (paymentMethod.toLowerCase().includes("bank")) {
         paymentMethod = "bank";
       } else {
-        paymentMethod = "card"; // Default
+        paymentMethod = "card"; 
       }
     }
 
@@ -54,17 +54,17 @@ export async function POST(request: Request) {
           name: item.name,
           price: item.price,
           quantity: item.quantity,
-          image: item.image || null,
+          image: item.image ?? null,
         })),
         subtotal: body.subtotal,
         shippingFee: body.shippingFee,
         total: body.total,
-        status: body.status || "pending",
+        status: body.status ?? "pending",
         payment: {
           method: paymentMethod,
-          transactionId: body.payment?.transactionId || null,
-          status: body.payment?.status || "pending",
-          details: body.payment?.details || {},
+          transactionId: body.payment?.transactionId ?? null,
+          status: body.payment?.status ?? "pending",
+          details: body.payment?.details ?? {},
         },
       },
     });
@@ -79,18 +79,45 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const payload = await getPayload({ config });
+
+    // Get the authenticated user
+    const { user } = await payload.auth({ headers: request.headers });
+
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    // Fetch orders for the authenticated user
     const orders = await payload.find({
       collection: "orders",
+      where: {
+        "customer.email": {
+          equals: user.email,
+        },
+      },
+      sort: "-createdAt",
+      limit: 50,
+      depth: 1, // Reduce depth to avoid session issues
     });
 
-    return NextResponse.json(orders.docs);
+    return NextResponse.json(orders);
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error("Orders fetch error:", error);
+
+    // If it's a session error, try to return empty result instead of error
+    if (
+      error instanceof Error &&
+      (error.message?.includes("session") || error.message?.includes("Session"))
+    ) {
+      console.warn("Session error detected, returning empty orders list");
+      return NextResponse.json({ docs: [], totalDocs: 0, limit: 50, page: 1 });
+    }
+
     return NextResponse.json(
-      { error: "Failed to fetch orders" },
+      { message: "Failed to fetch orders" },
       { status: 500 }
     );
   }

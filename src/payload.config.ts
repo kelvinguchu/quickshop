@@ -13,7 +13,7 @@ import { Categories } from "./collections/Categories";
 import { SubCategories } from "./collections/SubCategories";
 import { Products } from "./collections/Products";
 import Orders from "./collections/Orders";
-import { Testimonials } from "./collections/Testimonials";
+import CustomOrders from "./collections/CustomOrders";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -24,6 +24,22 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: " - QuickShop",
+      icons: [
+        {
+          rel: "icon",
+          type: "image/png",
+          url: "/icons/icon-192x192.png",
+        },
+      ],
+    },
+    components: {
+      graphics: {
+        Logo: "./components/admin/Logo.tsx",
+        Icon: "./components/admin/Icon.tsx",
+      },
+    },
   },
   collections: [
     Users,
@@ -32,15 +48,15 @@ export default buildConfig({
     SubCategories,
     Products,
     Orders,
-    Testimonials,
+    CustomOrders,
   ],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || "",
+  secret: process.env.PAYLOAD_SECRET ?? "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || "",
+    url: process.env.DATABASE_URI ?? "",
   }),
   sharp,
   plugins: [

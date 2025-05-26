@@ -184,7 +184,7 @@ export default function ProductCard({
       {/* Wishlist button - elegant positioning */}
       <button
         onClick={handleWishlistToggle}
-        className='absolute right-1 bottom-24 sm:bottom-28 flex h-8 w-8 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-colors'
+        className='absolute right-2 top-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-colors'
         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>
         {isWishlisted ? (
           <FaHeart className='text-red-500 w-4 h-4 sm:w-4 sm:h-4' />
@@ -200,7 +200,7 @@ export default function ProductCard({
           className='absolute z-10 pointer-events-none'
           style={{
             right: "12px",
-            bottom: "112px",
+            top: "12px",
             transform: `translate(${emoji.x}px, ${emoji.y}px) rotate(${emoji.rotation}deg) scale(${emoji.scale})`,
             opacity: emoji.opacity,
             animation: "confetti 1s ease-out forwards",

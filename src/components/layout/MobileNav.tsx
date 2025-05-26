@@ -7,38 +7,22 @@ import { useCart } from "@/lib/cart/CartContext";
 import { useWishlistStore } from "@/lib/wishlist/wishlistStore";
 import { WishlistSheet } from "@/components/wishlist/WishlistSheet";
 import { CartSheet } from "@/components/cart/CartSheet";
+import { UserButton } from "@/components/auth/UserButton";
 import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import type { CategoryUI } from "@/types/navigation";
 
-// Import Payload types
-import type {
-  Category as PayloadCategory,
-  Subcategory as PayloadSubcategory,
-} from "@/payload-types";
+interface MobileNavProps {
+  categories: CategoryUI[];
+}
 
-// Simplified local types for UI
-type SubcategoryUI = {
-  id: string;
-  name: string;
-  slug: string;
-};
-
-type CategoryUI = {
-  id: string;
-  name: string;
-  slug: string;
-  subcategories: SubcategoryUI[];
-};
-
-export default function MobileNav() {
+export default function MobileNav({ categories }: MobileNavProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [categories, setCategories] = useState<CategoryUI[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { itemCount } = useCart();
   const wishlistCount = useWishlistStore((state) => state.itemCount);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -55,100 +39,6 @@ export default function MobileNav() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Fetch categories from Payload CMS built-in API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setIsLoading(true);
-
-        // First fetch categories
-        const categoriesResponse = await fetch("/api/categories");
-
-        if (!categoriesResponse.ok) {
-          console.error(
-            "Failed to fetch categories:",
-            categoriesResponse.status
-          );
-          throw new Error(
-            `Failed to fetch categories: ${categoriesResponse.status}`
-          );
-        }
-
-        const categoriesData = await categoriesResponse.json();
-
-        // Now fetch subcategories
-        const subcategoriesResponse = await fetch("/api/subcategories");
-
-        if (!subcategoriesResponse.ok) {
-          console.error(
-            "Failed to fetch subcategories:",
-            subcategoriesResponse.status
-          );
-          throw new Error(
-            `Failed to fetch subcategories: ${subcategoriesResponse.status}`
-          );
-        }
-
-        const subcategoriesData = await subcategoriesResponse.json();
-
-        const categoriesMap: Record<string, CategoryUI> = {};
-        (categoriesData.docs as PayloadCategory[]).forEach((cat) => {
-          categoriesMap[cat.id] = {
-            id: cat.id,
-            name: cat.name,
-            slug: cat.slug,
-            subcategories: [], // Initialize empty subcategories array
-          };
-        });
-
-        // Organize subcategories
-        (subcategoriesData.docs as PayloadSubcategory[]).forEach((subcat) => {
-          const categoryId =
-            typeof subcat.category === "object"
-              ? subcat.category?.id
-              : subcat.category;
-          if (categoryId && categoriesMap[categoryId]) {
-            categoriesMap[categoryId].subcategories.push({
-              id: subcat.id,
-              name: subcat.name,
-              slug: subcat.slug,
-            });
-          }
-        });
-
-        setCategories(Object.values(categoriesMap));
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-
-        // Mock data if there's an error
-        setCategories([
-          {
-            id: "mock1",
-            name: "Abaya",
-            slug: "abaya",
-            subcategories: [
-              { id: "sub1", name: "Classic", slug: "classic" },
-              { id: "sub2", name: "Modern", slug: "modern" },
-            ],
-          },
-          {
-            id: "mock2",
-            name: "Qamis",
-            slug: "qamis",
-            subcategories: [
-              { id: "sub3", name: "Traditional", slug: "traditional" },
-              { id: "sub4", name: "Contemporary", slug: "contemporary" },
-            ],
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCategories();
   }, []);
 
   // Function to handle search UI
@@ -178,11 +68,7 @@ export default function MobileNav() {
 
             {/* Mobile Account Icon */}
             <div>
-              <IconButton
-                href='/'
-                icon={<User className='w-6 h-6 stroke-[1.5]' />}
-                label='Account'
-              />
+              <UserButton className='w-6 h-6' />
             </div>
           </div>
         </div>
@@ -262,40 +148,33 @@ export default function MobileNav() {
                   </div>
 
                   {/* Product Categories */}
-                  {isLoading ? (
-                    <div className='space-y-2'>
-                      <div className='h-12 bg-gray-100 animate-pulse rounded-sm'></div>
-                      <div className='h-12 bg-gray-100 animate-pulse rounded-sm'></div>
-                    </div>
-                  ) : (
-                    categories.map((category) => (
-                      <div
-                        key={category.id}
-                        className='border-b border-[#e0d8c9] pb-4'>
-                        <Link
-                          href={`/collections/${category.slug}`}
-                          className='flex items-center justify-between mb-2 text-[#382f21] font-medium hover:text-[#d4af37] transition-colors'
-                          onClick={() => setDrawerOpen(false)}>
-                          <span>{category.name}</span>
-                        </Link>
+                  {categories.map((category) => (
+                    <div
+                      key={category.id}
+                      className='border-b border-[#e0d8c9] pb-4'>
+                      <Link
+                        href={`/collections/${category.slug}`}
+                        className='flex items-center justify-between mb-2 text-[#382f21] font-medium hover:text-[#d4af37] transition-colors'
+                        onClick={() => setDrawerOpen(false)}>
+                        <span>{category.name}</span>
+                      </Link>
 
-                        {category.subcategories &&
-                          category.subcategories.length > 0 && (
-                            <div className='pl-4 space-y-2'>
-                              {category.subcategories.map((subcategory) => (
-                                <Link
-                                  key={subcategory.id}
-                                  href={`/collections/${category.slug}/${subcategory.slug}`}
-                                  className='block py-1 text-sm text-[#8a7d65] hover:text-[#d4af37] transition-colors'
-                                  onClick={() => setDrawerOpen(false)}>
-                                  {subcategory.name}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                      </div>
-                    ))
-                  )}
+                      {category.subcategories &&
+                        category.subcategories.length > 0 && (
+                          <div className='pl-4 space-y-2'>
+                            {category.subcategories.map((subcategory) => (
+                              <Link
+                                key={subcategory.id}
+                                href={`/collections/${category.slug}/${subcategory.slug}`}
+                                className='block py-1 text-sm text-[#8a7d65] hover:text-[#d4af37] transition-colors'
+                                onClick={() => setDrawerOpen(false)}>
+                                {subcategory.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </DrawerContent>

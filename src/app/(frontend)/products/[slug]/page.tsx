@@ -5,9 +5,6 @@ import type { PaginatedDocs } from "payload";
 import type { Product } from "@/payload-types";
 import config from "@/payload.config";
 
-// Import our components
-import ProductGallery from "@/components/products/ProductGallery";
-import ProductDetails from "@/components/products/ProductDetails";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import Breadcrumb from "@/components/products/Breadcrumb";
 
@@ -101,9 +98,9 @@ export async function generateMetadata({
 
 export default async function ProductPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ slug: string }>;
-}) {
+}>) {
   const { slug } = await params;
 
   // Initialize payload

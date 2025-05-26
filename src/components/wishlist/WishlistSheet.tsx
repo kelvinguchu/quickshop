@@ -3,9 +3,10 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { X, Trash2, ShoppingBag, Heart, Check, AlertCircle } from 'lucide-react'
+import { X, Trash2, ShoppingBag, Heart, Check, AlertCircle, User } from 'lucide-react'
 import { useWishlistStore } from '@/lib/wishlist/wishlistStore'
 import { useCart } from '@/lib/cart/CartContext'
+import { useAuth } from '@/lib/auth/AuthContext'
 import {
   Sheet,
   SheetContent,
@@ -22,6 +23,7 @@ interface WishlistSheetProps {
 export function WishlistSheet({ children }: WishlistSheetProps) {
   const { items, removeItem, clearWishlist } = useWishlistStore()
   const { items: cartItems, addItem: addToCart } = useCart()
+  const { user } = useAuth()
   const [addedItems, setAddedItems] = useState<Record<string, boolean>>({})
 
   // Check if an item is already in the cart
@@ -68,9 +70,26 @@ export function WishlistSheet({ children }: WishlistSheetProps) {
                 <Heart className="w-8 h-8 text-[#8a7d65]" />
               </div>
               <h3 className="font-cinzel text-lg text-[#382f21] mb-2">Your wishlist is empty</h3>
-              <p className="text-[#8a7d65] text-sm">
+              <p className="text-[#8a7d65] text-sm mb-4">
                 Items added to your wishlist will appear here
               </p>
+              {!user && (
+                <div className="bg-blue-50 border border-blue-200 rounded-sm p-3 mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">Sign in to save your wishlist</span>
+                  </div>
+                  <p className="text-xs text-blue-700 mb-2">
+                    Keep your favorite items saved across all devices
+                  </p>
+                  <Link
+                    href="/login"
+                    className="inline-block bg-blue-600 text-white px-3 py-1.5 rounded-sm text-xs font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
             <ul className="divide-y divide-[#e0d8c9]/40">
@@ -147,6 +166,23 @@ export function WishlistSheet({ children }: WishlistSheetProps) {
 
         {items.length > 0 && (
           <div className="border-t border-[#e0d8c9]/40 px-4 py-3">
+            {!user && (
+              <div className="bg-blue-50 border border-blue-200 rounded-sm p-3 mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">Sign in to save your wishlist</span>
+                </div>
+                <p className="text-xs text-blue-700 mb-2">
+                  Keep your favorite items saved across all devices
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-block bg-blue-600 text-white px-3 py-1.5 rounded-sm text-xs font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
             <button
               onClick={clearWishlist}
               className="w-full bg-transparent border border-[#382f21] text-[#382f21] rounded-sm font-montserrat text-sm uppercase tracking-wider text-center hover:bg-[#382f21] hover:text-white transition-colors flex items-center justify-center gap-2 py-2 px-4"

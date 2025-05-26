@@ -11,14 +11,11 @@ import {
 
 import config from "@/payload.config";
 import type { PaginatedDocs } from "payload";
-import type { Category, Product, Testimonial } from "@/payload-types";
+import type { Category, Product } from "@/payload-types";
 import Hero from "@/components/home/Hero";
 import SectionTitle from "@/components/home/SectionTitle";
 import ProductCard from "@/components/home/ProductCard";
 import CategoryCard, { CategoryCardData } from "@/components/home/CategoryCard";
-import TestimonialMarquee, {
-  Testimonial as MarqueeTestimonial,
-} from "@/components/home/TestimonialMarquee";
 import FAQ from "@/components/home/FAQ";
 
 // Static data for FAQs
@@ -47,34 +44,6 @@ const faqData = [
     question: "How do I care for my garments?",
     answer:
       "We recommend dry cleaning for most of our items to maintain their quality and appearance. Specific care instructions are included with each garment.",
-  },
-];
-
-// Static testimonials as fallback
-const staticTestimonials = [
-  {
-    id: "testimonial1",
-    customerName: "Aisha Rahman",
-    text: "I am absolutely in love with my new abaya! The quality of the fabric is exceptional and the attention to detail in the embroidery is stunning.",
-    rating: 5,
-  },
-  {
-    id: "testimonial2",
-    customerName: "Yusuf Ali",
-    text: "The custom measurements option was perfect for me. My qamis fits beautifully and the quality is far superior to anything I've purchased before.",
-    rating: 5,
-  },
-  {
-    id: "testimonial3",
-    customerName: "Fatima Zahra",
-    text: "Quick delivery and the product was exactly as pictured. I've already received many compliments on my new abaya!",
-    rating: 4,
-  },
-  {
-    id: "testimonial4",
-    customerName: "Ahmed Hassan",
-    text: "Excellent customer service! They helped me choose the right size and the qamis arrived perfectly tailored.",
-    rating: 5,
   },
 ];
 
@@ -145,19 +114,6 @@ export default async function HomePage() {
   };
 
   let trendingQamis: PaginatedDocs<Product> = {
-    docs: [],
-    totalDocs: 0,
-    limit: 0,
-    page: 1,
-    pagingCounter: 0,
-    totalPages: 0,
-    hasPrevPage: false,
-    hasNextPage: false,
-    prevPage: null,
-    nextPage: null,
-  };
-
-  let testimonials: PaginatedDocs<Testimonial> = {
     docs: [],
     totalDocs: 0,
     limit: 0,
@@ -245,30 +201,6 @@ export default async function HomePage() {
     console.error("Error fetching qamis:", error);
   }
 
-  try {
-    // Fetch featured testimonials
-    testimonials = await payload.find({
-      collection: "testimonials",
-      where: {
-        AND: [
-          {
-            featured: {
-              equals: true,
-            },
-          },
-          {
-            active: {
-              equals: true,
-            },
-          },
-        ],
-      },
-      limit: 4,
-    });
-  } catch (error) {
-    console.error("Error fetching testimonials:", error);
-  }
-
   // Add custom category directly to the display list, no static fallbacks
   const customCategory: CategoryCardData = {
     id: "custom",
@@ -286,12 +218,6 @@ export default async function HomePage() {
   // Use CMS data directly without static fallbacks for products
   const abayasToDisplay = trendingAbayas.docs;
   const qamisToDisplay = trendingQamis.docs;
-
-  // Use static testimonials as fallback
-  const testimonialsToDisplay: MarqueeTestimonial[] =
-    testimonials.docs.length > 0
-      ? (testimonials.docs as unknown as MarqueeTestimonial[])
-      : staticTestimonials;
 
   return (
     <div>
@@ -424,18 +350,6 @@ export default async function HomePage() {
               collectionName='Qamis'
             />
           )}
-        </div>
-      </section>
-
-      {/* Testimonials Section with Marquee */}
-      <section className='py-10 md:py-16 bg-[#f9f6f2]'>
-        <div className='container mx-auto px-4'>
-          <SectionTitle
-            title='What Our Customers Say'
-            subtitle='Testimonials'
-          />
-
-          <TestimonialMarquee testimonials={testimonialsToDisplay} />
         </div>
       </section>
 

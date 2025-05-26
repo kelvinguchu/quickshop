@@ -353,46 +353,7 @@ svg {
   color: var(--accent-color);
 }
 
-/* Testimonials Section */
-.testimonials-section {
-  padding: 3rem 0;
-}
 
-.testimonials-carousel {
-  display: flex;
-  gap: 2rem;
-  overflow-x: auto;
-  padding: 1rem 0;
-}
-
-.testimonial-card {
-  flex: 0 0 350px;
-  padding: 2rem;
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow);
-}
-
-.testimonial-rating {
-  color: gold;
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.testimonial-text {
-  font-style: italic;
-  margin-bottom: 1.5rem;
-}
-
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.testimonial-author img {
-  border-radius: 50%;
-}
 
 /* FAQs Section */
 .faqs-section {

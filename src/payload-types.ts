@@ -73,7 +73,7 @@ export interface Config {
     subcategories: Subcategory;
     products: Product;
     orders: Order;
-    testimonials: Testimonial;
+    'custom-orders': CustomOrder;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -86,7 +86,7 @@ export interface Config {
     subcategories: SubcategoriesSelect<false> | SubcategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
-    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'custom-orders': CustomOrdersSelect<false> | CustomOrdersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -129,6 +129,36 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  firstName: string;
+  lastName: string;
+  /**
+   * Upload a profile photo
+   */
+  profilePhoto?: (string | null) | Media;
+  /**
+   * User's saved cart items
+   */
+  cart?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * User's saved wishlist items
+   */
+  wishlist?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -349,17 +379,139 @@ export interface Order {
   createdAt: string;
 }
 /**
+ * Custom measurement orders with deposit payments
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials".
+ * via the `definition` "custom-orders".
  */
-export interface Testimonial {
+export interface CustomOrder {
   id: string;
-  customerName: string;
-  customerImage?: (string | null) | Media;
-  rating: '5' | '4' | '3' | '2' | '1';
-  text: string;
-  active?: boolean | null;
-  featured?: boolean | null;
+  /**
+   * Unique custom order identifier
+   */
+  orderNumber: string;
+  product: {
+    /**
+     * Product ID/slug
+     */
+    id: string;
+    name: string;
+    price: number;
+    /**
+     * Product image URL
+     */
+    image?: string | null;
+  };
+  measurements: {
+    /**
+     * Chest measurement in cm
+     */
+    chest: number;
+    /**
+     * Shoulder width in cm
+     */
+    shoulder: number;
+    /**
+     * Sleeve length in cm
+     */
+    sleeve: number;
+    /**
+     * Total length in cm
+     */
+    length: number;
+    /**
+     * Waist measurement in cm
+     */
+    waist: number;
+    /**
+     * Hip measurement in cm
+     */
+    hip: number;
+  };
+  customer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  shippingAddress: {
+    address: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  /**
+   * 30% deposit amount paid
+   */
+  depositAmount: number;
+  /**
+   * Remaining 70% to be paid
+   */
+  remainingAmount: number;
+  /**
+   * Total order amount
+   */
+  totalAmount: number;
+  payment: {
+    method: 'card' | 'mpesa' | 'bank';
+    /**
+     * Payment provider transaction ID for deposit
+     */
+    transactionId?: string | null;
+    status?: ('pending' | 'complete' | 'failed') | null;
+    /**
+     * Additional payment details from provider
+     */
+    details?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  /**
+   * Final 70% payment details
+   */
+  finalPayment?: {
+    method?: ('card' | 'mpesa' | 'bank' | 'cod') | null;
+    /**
+     * Payment provider transaction ID for final payment
+     */
+    transactionId?: string | null;
+    status?: ('pending' | 'complete' | 'failed') | null;
+    /**
+     * When the final payment was completed
+     */
+    paidAt?: string | null;
+  };
+  status:
+    | 'deposit-paid'
+    | 'in-production'
+    | 'quality-check'
+    | 'ready-for-payment'
+    | 'fully-paid'
+    | 'shipped'
+    | 'delivered'
+    | 'cancelled';
+  /**
+   * Customer notes or special requirements
+   */
+  notes?: string | null;
+  /**
+   * Internal production notes
+   */
+  productionNotes?: string | null;
+  /**
+   * Estimated completion date for production
+   */
+  estimatedCompletionDate?: string | null;
+  /**
+   * When the order was completed
+   */
+  completedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -395,8 +547,8 @@ export interface PayloadLockedDocument {
         value: string | Order;
       } | null)
     | ({
-        relationTo: 'testimonials';
-        value: string | Testimonial;
+        relationTo: 'custom-orders';
+        value: string | CustomOrder;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -445,6 +597,11 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
+  profilePhoto?: T;
+  cart?: T;
+  wishlist?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -601,15 +758,68 @@ export interface OrdersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials_select".
+ * via the `definition` "custom-orders_select".
  */
-export interface TestimonialsSelect<T extends boolean = true> {
-  customerName?: T;
-  customerImage?: T;
-  rating?: T;
-  text?: T;
-  active?: T;
-  featured?: T;
+export interface CustomOrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  product?:
+    | T
+    | {
+        id?: T;
+        name?: T;
+        price?: T;
+        image?: T;
+      };
+  measurements?:
+    | T
+    | {
+        chest?: T;
+        shoulder?: T;
+        sleeve?: T;
+        length?: T;
+        waist?: T;
+        hip?: T;
+      };
+  customer?:
+    | T
+    | {
+        firstName?: T;
+        lastName?: T;
+        email?: T;
+        phone?: T;
+      };
+  shippingAddress?:
+    | T
+    | {
+        address?: T;
+        city?: T;
+        country?: T;
+        postalCode?: T;
+      };
+  depositAmount?: T;
+  remainingAmount?: T;
+  totalAmount?: T;
+  payment?:
+    | T
+    | {
+        method?: T;
+        transactionId?: T;
+        status?: T;
+        details?: T;
+      };
+  finalPayment?:
+    | T
+    | {
+        method?: T;
+        transactionId?: T;
+        status?: T;
+        paidAt?: T;
+      };
+  status?: T;
+  notes?: T;
+  productionNotes?: T;
+  estimatedCompletionDate?: T;
+  completedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

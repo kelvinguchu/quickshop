@@ -58,10 +58,10 @@ export async function generateMetadata({
 export default async function CategoryPage({
   params,
   searchParams,
-}: {
+}: Readonly<{
   params: Promise<{ category: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
+}>) {
   const { category } = await params;
   const resolvedSearchParams = await searchParams;
 
@@ -71,99 +71,66 @@ export default async function CategoryPage({
       ? resolvedSearchParams.sort
       : "latest";
 
-  // Initialize payload
   const payload = await getPayload({ config });
 
-  // Fetch the category
-  const categoryData = await payload.find({
-    collection: "categories",
-    where: {
-      slug: {
-        equals: category,
-      },
-    },
-    limit: 1,
-  });
-
-  if (categoryData.docs.length === 0) {
-    notFound();
-  }
-
-  const categoryDoc = categoryData.docs[0];
-  const categoryId = categoryDoc.id;
-
-  // Initialize with empty data
-  let subcategories: PaginatedDocs<Subcategory> = {
-    docs: [],
-    totalDocs: 0,
-    limit: 0,
-    page: 1,
-    pagingCounter: 0,
-    totalPages: 0,
-    hasPrevPage: false,
-    hasNextPage: false,
-    prevPage: null,
-    nextPage: null,
-  };
-  let products: PaginatedDocs<Product> = {
-    docs: [],
-    totalDocs: 0,
-    limit: 0,
-    page: 1,
-    pagingCounter: 0,
-    totalPages: 0,
-    hasPrevPage: false,
-    hasNextPage: false,
-    prevPage: null,
-    nextPage: null,
-  };
-
   try {
-    // Fetch all subcategories for the current category
-    subcategories = await payload.find<
-      "subcategories",
-      SubcategoriesSelect<true>
-    >({
-      collection: "subcategories",
+    // Fetch the category
+    const categoryData = await payload.find({
+      collection: "categories",
       where: {
-        category: {
-          equals: categoryId,
+        slug: {
+          equals: category,
         },
       },
-      sort: "displayOrder",
+      limit: 1,
     });
-  } catch (error) {
-    console.error("Error fetching subcategories:", error);
-  }
 
-  try {
-    // Fetch products directly with literal query object
-    products = await payload.find<"products", ProductsSelect<true>>({
-      collection: "products",
-      where: {
-        category: {
-          equals: categoryId,
+    if (categoryData.docs.length === 0) {
+      notFound();
+    }
+
+    const categoryDoc = categoryData.docs[0];
+    const categoryId = categoryDoc.id;
+
+    // Fetch subcategories and products in parallel for better performance
+    const [subcategoriesData, productsData] = await Promise.all([
+      payload.find<"subcategories", SubcategoriesSelect<true>>({
+        collection: "subcategories",
+        where: {
+          category: {
+            equals: categoryId,
+          },
         },
-      },
-      sort:
-        sort === "price-desc"
-          ? "-price"
-          : sort === "price-asc"
-            ? "price"
-            : "-createdAt",
-      limit: 12,
-    });
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  }
+        sort: "displayOrder",
+      }),
+      payload.find<"products", ProductsSelect<true>>({
+        collection: "products",
+        where: {
+          category: {
+            equals: categoryId,
+          },
+        },
+        sort:
+          sort === "price-desc"
+            ? "-price"
+            : sort === "price-asc"
+              ? "price"
+              : "-createdAt",
+        limit: 12,
+      }),
+    ]);
 
-  return (
-    <CategoryDisplay
-      category={categoryDoc}
-      subcategories={subcategories.docs}
-      products={products.docs}
-      totalProducts={products.totalDocs}
-      currentSort={sort}
-    />
-  );
+    return (
+      <CategoryDisplay
+        category={categoryDoc}
+        subcategories={subcategoriesData.docs}
+        products={productsData.docs}
+        totalProducts={productsData.totalDocs}
+        currentSort={sort}
+      />
+    );
+  } catch (error) {
+    console.error("Error fetching category data:", error);
+    throw error;
+  }
 }

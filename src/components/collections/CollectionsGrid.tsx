@@ -17,7 +17,7 @@ interface CollectionsGridProps {
   categories: PayloadCategory[];
 }
 
-export default function CollectionsGrid({ categories }: CollectionsGridProps) {
+export default function CollectionsGrid({ categories }: Readonly<CollectionsGridProps>) {
   // Map Payload categories to a simpler structure for view components
   const processedCategories: ProcessedCategory[] = categories.map((cat) => {
     let imageUrl: string | undefined;
@@ -25,7 +25,7 @@ export default function CollectionsGrid({ categories }: CollectionsGridProps) {
     if (typeof cat.image === "string") {
       imageUrl = cat.image;
     } else if (cat.image && typeof cat.image === "object") {
-      imageUrl = (cat.image as Media).url ?? undefined;
+      imageUrl = (cat.image).url ?? undefined;
     }
 
     return {
@@ -37,30 +37,10 @@ export default function CollectionsGrid({ categories }: CollectionsGridProps) {
     };
   });
 
-  // Specify default images when no categories exist
-  const defaultCategories = [
-    {
-      id: "1",
-      name: "Abayas",
-      slug: "abayas",
-      mainImage: "/abayas/abaya1.webp",
-    },
-    {
-      id: "2",
-      name: "Qamis",
-      slug: "qamis",
-      mainImage: "/qamis/qamis1.webp",
-    },
-  ];
-
-  // Use processed categories if they exist, otherwise use defaults
-  const displayCategories =
-    processedCategories.length > 0 ? processedCategories : defaultCategories;
-
   return (
     <div className='bg-[#f9f6f2]'>
-      <MobileCollectionView categories={displayCategories} />
-      <DesktopCollectionView categories={displayCategories} />
+      <MobileCollectionView categories={processedCategories} />
+      <DesktopCollectionView categories={processedCategories} />
     </div>
   );
 }

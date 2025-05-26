@@ -2,47 +2,23 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Search,
-  Heart,
-  ShoppingBag,
-  User,
-  ChevronDown,
-  Instagram,
-  Facebook,
-  Twitter,
-} from "lucide-react";
+import { BiLogoInstagram, BiLogoFacebook, BiLogoTwitter } from "react-icons/bi";
+import { Search, Heart, ShoppingBag, ChevronDown } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useWishlistStore } from "@/lib/wishlist/wishlistStore";
 import { WishlistSheet } from "@/components/wishlist/WishlistSheet";
 import { CartSheet } from "@/components/cart/CartSheet";
+import { UserButton } from "@/components/auth/UserButton";
 import MobileNav from "./MobileNav";
+import type { CategoryUI } from "@/types/navigation";
 
-// Import Payload types
-import type {
-  Category as PayloadCategory,
-  Subcategory as PayloadSubcategory,
-} from "@/payload-types";
+interface NavbarProps {
+  categories: CategoryUI[];
+}
 
-// Simplified local types for UI
-type SubcategoryUI = {
-  id: string;
-  name: string;
-  slug: string;
-};
-
-type CategoryUI = {
-  id: string;
-  name: string;
-  slug: string;
-  subcategories: SubcategoryUI[];
-};
-
-export default function Navbar() {
+export default function Navbar({ categories }: Readonly<NavbarProps>) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [categories, setCategories] = useState<CategoryUI[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const { itemCount } = useCart();
   const wishlistCount = useWishlistStore((state) => state.itemCount);
@@ -61,101 +37,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fetch categories from Payload CMS built-in API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setIsLoading(true);
-
-        // First fetch categories
-        const categoriesResponse = await fetch("/api/categories");
-
-        if (!categoriesResponse.ok) {
-          console.error(
-            "Failed to fetch categories:",
-            categoriesResponse.status
-          );
-          throw new Error(
-            `Failed to fetch categories: ${categoriesResponse.status}`
-          );
-        }
-
-        const categoriesData = await categoriesResponse.json();
-
-        // Now fetch subcategories
-        const subcategoriesResponse = await fetch("/api/subcategories");
-
-        if (!subcategoriesResponse.ok) {
-          console.error(
-            "Failed to fetch subcategories:",
-            subcategoriesResponse.status
-          );
-          throw new Error(
-            `Failed to fetch subcategories: ${subcategoriesResponse.status}`
-          );
-        }
-
-        const subcategoriesData = await subcategoriesResponse.json();
-
-        // Create a map of categories by ID for quick lookup
-        const categoriesMap: Record<string, CategoryUI> = {};
-        (categoriesData.docs as PayloadCategory[]).forEach((cat) => {
-          categoriesMap[cat.id] = {
-            id: cat.id,
-            name: cat.name,
-            slug: cat.slug,
-            subcategories: [], // Initialize empty subcategories array
-          };
-        });
-
-        // Organize subcategories
-        (subcategoriesData.docs as PayloadSubcategory[]).forEach((subcat) => {
-          const categoryId =
-            typeof subcat.category === "object"
-              ? subcat.category?.id
-              : subcat.category;
-          if (categoryId && categoriesMap[categoryId]) {
-            categoriesMap[categoryId].subcategories.push({
-              id: subcat.id,
-              name: subcat.name,
-              slug: subcat.slug,
-            });
-          }
-        });
-
-        setCategories(Object.values(categoriesMap));
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-
-        // Mock data if there's an error
-        setCategories([
-          {
-            id: "mock1",
-            name: "Abaya",
-            slug: "abaya",
-            subcategories: [
-              { id: "sub1", name: "Classic", slug: "classic" },
-              { id: "sub2", name: "Modern", slug: "modern" },
-            ],
-          },
-          {
-            id: "mock2",
-            name: "Qamis",
-            slug: "qamis",
-            subcategories: [
-              { id: "sub3", name: "Traditional", slug: "traditional" },
-              { id: "sub4", name: "Contemporary", slug: "contemporary" },
-            ],
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   const toggleDropdown = (name: string) => {
     if (activeDropdown === name) {
       setActiveDropdown(null);
@@ -168,7 +49,7 @@ export default function Navbar() {
     <>
       {/* Mobile Navigation */}
       <div className='md:hidden'>
-        <MobileNav />
+        <MobileNav categories={categories} />
       </div>
 
       {/* Desktop Navigation */}
@@ -184,21 +65,21 @@ export default function Navbar() {
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <Instagram className='h-4 w-4' />
+                <BiLogoInstagram className='h-4 w-4' />
               </a>
               <a
                 href='https://facebook.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <Facebook className='h-4 w-4' />
+                <BiLogoFacebook className='h-4 w-4' />
               </a>
               <a
                 href='https://twitter.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <Twitter className='h-4 w-4' />
+                <BiLogoTwitter className='h-4 w-4' />
               </a>
             </div>
             <div className='flex items-center space-x-4 font-montserrat'>
@@ -226,48 +107,43 @@ export default function Navbar() {
             <nav className='flex items-center space-x-1'>
               <NavItem href='/' label='Home' />
 
-              {isLoading ? (
-                // Loading placeholder
-                <div className='w-20 h-8 bg-gray-100 animate-pulse rounded'></div>
-              ) : (
-                // Render categories
-                categories.map((category) => (
-                  <div key={category.id} className='relative group'>
-                    <button
-                      className='flex items-center px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'
-                      onClick={() => toggleDropdown(category.slug)}>
-                      <span>{category.name}</span>
-                      <ChevronDown className='ml-1 h-4 w-4' />
-                    </button>
+              {/* Render categories */}
+              {categories.map((category) => (
+                <div key={category.id} className='relative group'>
+                  <button
+                    className='flex items-center px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'
+                    onClick={() => toggleDropdown(category.slug)}>
+                    <span>{category.name}</span>
+                    <ChevronDown className='ml-1 h-4 w-4' />
+                  </button>
 
-                    <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
-                      <div className='p-4'>
-                        <Link
-                          href={`/collections/${category.slug}`}
-                          className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
-                          All {category.name}
-                        </Link>
+                  <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
+                    <div className='p-4'>
+                      <Link
+                        href={`/collections/${category.slug}`}
+                        className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
+                        All {category.name}
+                      </Link>
 
-                        {category.subcategories &&
-                        category.subcategories.length > 0 ? (
-                          category.subcategories.map((subcategory) => (
-                            <Link
-                              key={subcategory.id}
-                              href={`/collections/${category.slug}/${subcategory.slug}`}
-                              className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
-                              {subcategory.name}
-                            </Link>
-                          ))
-                        ) : (
-                          <div className='text-sm text-gray-400 py-2'>
-                            No subcategories
-                          </div>
-                        )}
-                      </div>
+                      {category.subcategories &&
+                      category.subcategories.length > 0 ? (
+                        category.subcategories.map((subcategory) => (
+                          <Link
+                            key={subcategory.id}
+                            href={`/collections/${category.slug}/${subcategory.slug}`}
+                            className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
+                            {subcategory.name}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className='text-sm text-gray-400 py-2'>
+                          No subcategories
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))
-              )}
+                </div>
+              ))}
 
               <NavItem href='/collections' label='New Arrivals' />
               <NavItem href='/collections' label='Sale' />
@@ -315,11 +191,7 @@ export default function Navbar() {
               </WishlistSheet>
 
               {/* User Account */}
-              <IconButton
-                href='/'
-                icon={<User className='w-5 h-5 stroke-[1.5]' />}
-                label='Account'
-              />
+              <UserButton />
 
               {/* Shopping Bag */}
               <CartSheet>
@@ -343,7 +215,13 @@ export default function Navbar() {
 }
 
 // NavItem component for consistent styling
-function NavItem({ href, label }: { href: string; label: string }) {
+function NavItem({
+  href,
+  label,
+}: Readonly<{
+  href: string;
+  label: string;
+}>) {
   return (
     <Link
       href={href}
@@ -359,12 +237,12 @@ function IconButton({
   icon,
   label,
   badge,
-}: {
+}: Readonly<{
   href: string;
   icon: React.ReactNode;
   label: string;
   badge?: number;
-}) {
+}>) {
   return (
     <Link
       href={href}
