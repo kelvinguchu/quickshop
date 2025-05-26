@@ -1,18 +1,18 @@
+// Base brand styling using placeholder selector (more efficient)
+%brand-base {
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .logo {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 24px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  @extend %brand-base;
+  font-size: 24px;
 }
 
 .icon {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  @extend %brand-base;
 }

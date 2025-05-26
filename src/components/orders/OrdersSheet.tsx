@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Package, Calendar, Truck, CheckCircle, Clock } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -78,7 +78,7 @@ export function OrdersSheet({ children }: Readonly<OrdersSheetProps>) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user) return;
 
     setIsLoading(true);
@@ -100,11 +100,11 @@ export function OrdersSheet({ children }: Readonly<OrdersSheetProps>) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [user, fetchOrders]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

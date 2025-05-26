@@ -58,6 +58,13 @@ export default async function CustomPage() {
             <span className='sm:hidden'>Custom Orders</span>
             <span className='hidden sm:inline'>Custom Measurements</span>
           </h1>
+
+          {/* Authentication Notice */}
+          <div className='mt-2 sm:mt-3'>
+            <p className='text-[#8a7d65] text-xs sm:text-sm'>
+              Account required for custom orders
+            </p>
+          </div>
         </div>
 
         {/* Category Filter */}

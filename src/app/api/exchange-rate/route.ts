@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Cache is expired or doesn't exist, fetch new data
-    console.log("Fetching fresh exchange rate data...");
     const freshData = await fetchExchangeRate();
 
     // Update cache

@@ -30,7 +30,10 @@ export default async function AccountPage() {
       depth: 2, // Include related media data
     });
 
-    return <AccountDashboard user={userWithPhoto} />;
+    return ( 
+      <div > 
+    <AccountDashboard user={userWithPhoto} />
+    </div> );
   } catch (error) {
     console.error("Auth error:", error);
     redirect("/login?error=Authentication failed&redirect=/account");

@@ -22,6 +22,30 @@ export interface User {
         url?: string | null;
       }
     | null;
+  savedMeasurements?: {
+    abaya?: {
+      chest?: number;
+      shoulder?: number;
+      sleeve?: number;
+      length?: number;
+      waist?: number;
+      hip?: number;
+    };
+    qamis?: {
+      chest?: number;
+      shoulder?: number;
+      sleeve?: number;
+      length?: number;
+      waist?: number;
+      hip?: number;
+    };
+  };
+  savedShippingAddress?: {
+    address?: string;
+    city?: string;
+    country?: string;
+    postalCode?: string;
+  };
 }
 
 interface AuthContextType {

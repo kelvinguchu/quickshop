@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Ruler,
@@ -114,7 +114,7 @@ export function CustomOrdersSheet({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCustomOrders = async () => {
+  const fetchCustomOrders = useCallback(async () => {
     if (!user) return;
 
     setIsLoading(true);
@@ -138,11 +138,11 @@ export function CustomOrdersSheet({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchCustomOrders();
-  }, [user]);
+  }, [user, fetchCustomOrders]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

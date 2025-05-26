@@ -159,6 +159,98 @@ export interface User {
     | number
     | boolean
     | null;
+  /**
+   * User's mobile/phone number
+   */
+  phone?: string | null;
+  /**
+   * User's saved body measurements for custom orders by category
+   */
+  savedMeasurements?: {
+    /**
+     * Measurements for abaya category
+     */
+    abaya?: {
+      /**
+       * Chest measurement in cm
+       */
+      chest?: number | null;
+      /**
+       * Shoulder width in cm
+       */
+      shoulder?: number | null;
+      /**
+       * Sleeve length in cm
+       */
+      sleeve?: number | null;
+      /**
+       * Total length in cm
+       */
+      length?: number | null;
+      /**
+       * Waist measurement in cm
+       */
+      waist?: number | null;
+      /**
+       * Hip measurement in cm
+       */
+      hip?: number | null;
+    };
+    /**
+     * Measurements for qamis category
+     */
+    qamis?: {
+      /**
+       * Chest measurement in cm
+       */
+      chest?: number | null;
+      /**
+       * Shoulder width in cm
+       */
+      shoulder?: number | null;
+      /**
+       * Sleeve length in cm
+       */
+      sleeve?: number | null;
+      /**
+       * Total length in cm
+       */
+      length?: number | null;
+      /**
+       * Waist measurement in cm
+       */
+      waist?: number | null;
+      /**
+       * Hip measurement in cm
+       */
+      hip?: number | null;
+    };
+  };
+  /**
+   * User's saved shipping address
+   */
+  savedShippingAddress?: {
+    /**
+     * Street address
+     */
+    address?: string | null;
+    /**
+     * City
+     */
+    city?: string | null;
+    /**
+     * Country
+     */
+    country?: string | null;
+    /**
+     * Postal/ZIP code
+     */
+    postalCode?: string | null;
+  };
+  /**
+   * User role for access control
+   */
+  role: 'customer' | 'admin';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -390,6 +482,10 @@ export interface CustomOrder {
    * Unique custom order identifier
    */
   orderNumber: string;
+  /**
+   * ID of the user who created this order
+   */
+  userId: string;
   product: {
     /**
      * Product ID/slug
@@ -602,6 +698,40 @@ export interface UsersSelect<T extends boolean = true> {
   profilePhoto?: T;
   cart?: T;
   wishlist?: T;
+  phone?: T;
+  savedMeasurements?:
+    | T
+    | {
+        abaya?:
+          | T
+          | {
+              chest?: T;
+              shoulder?: T;
+              sleeve?: T;
+              length?: T;
+              waist?: T;
+              hip?: T;
+            };
+        qamis?:
+          | T
+          | {
+              chest?: T;
+              shoulder?: T;
+              sleeve?: T;
+              length?: T;
+              waist?: T;
+              hip?: T;
+            };
+      };
+  savedShippingAddress?:
+    | T
+    | {
+        address?: T;
+        city?: T;
+        country?: T;
+        postalCode?: T;
+      };
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -762,6 +892,7 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface CustomOrdersSelect<T extends boolean = true> {
   orderNumber?: T;
+  userId?: T;
   product?:
     | T
     | {

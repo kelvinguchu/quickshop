@@ -1,9 +1,7 @@
 export default function Icon() {
     return (
-      <div>
-        <span className='icon'>
+    <div className="icon">
           Q
-        </span>
       </div>
     );
 }

@@ -52,8 +52,9 @@ export function CheckoutForm() {
   // Fixed shipping fee in USD
   const shippingFee = 2.5;
   const finalTotal = total + shippingFee;
-  // Convert final total to KES using real-time exchange rate
-  const finalAmountInKES = Math.round(finalTotal * exchangeRate);
+  // Convert final total to KES using real-time exchange rate with proper currency rounding
+  // Round to 2 decimal places for currency
+  const finalAmountInKES = Math.round(finalTotal * exchangeRate * 100) / 100;
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -237,7 +238,6 @@ export function CheckoutForm() {
         );
       })
       .on("IN-PROGRESS", (results: any) => {
-        console.log("Payment in progress", results);
         setIsProcessing(true);
       });
   }, [

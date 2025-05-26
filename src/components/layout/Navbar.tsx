@@ -109,40 +109,40 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
 
               {/* Render categories */}
               {categories.map((category) => (
-                <div key={category.id} className='relative group'>
-                  <button
-                    className='flex items-center px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'
-                    onClick={() => toggleDropdown(category.slug)}>
-                    <span>{category.name}</span>
-                    <ChevronDown className='ml-1 h-4 w-4' />
-                  </button>
+                  <div key={category.id} className='relative group'>
+                    <button
+                      className='flex items-center px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'
+                      onClick={() => toggleDropdown(category.slug)}>
+                      <span>{category.name}</span>
+                      <ChevronDown className='ml-1 h-4 w-4' />
+                    </button>
 
-                  <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
-                    <div className='p-4'>
-                      <Link
-                        href={`/collections/${category.slug}`}
-                        className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
-                        All {category.name}
-                      </Link>
+                    <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
+                      <div className='p-4'>
+                        <Link
+                          href={`/collections/${category.slug}`}
+                          className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
+                          All {category.name}
+                        </Link>
 
-                      {category.subcategories &&
-                      category.subcategories.length > 0 ? (
-                        category.subcategories.map((subcategory) => (
-                          <Link
-                            key={subcategory.id}
-                            href={`/collections/${category.slug}/${subcategory.slug}`}
-                            className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
-                            {subcategory.name}
-                          </Link>
-                        ))
-                      ) : (
-                        <div className='text-sm text-gray-400 py-2'>
-                          No subcategories
-                        </div>
-                      )}
+                        {category.subcategories &&
+                        category.subcategories.length > 0 ? (
+                          category.subcategories.map((subcategory) => (
+                            <Link
+                              key={subcategory.id}
+                              href={`/collections/${category.slug}/${subcategory.slug}`}
+                              className='block py-2 text-sm font-montserrat text-[#382f21] hover:text-[#d4af37] transition-colors'>
+                              {subcategory.name}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className='text-sm text-gray-400 py-2'>
+                            No subcategories
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
               ))}
 
               <NavItem href='/collections' label='New Arrivals' />

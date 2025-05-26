@@ -28,6 +28,7 @@ export function ProfileSheet({ children }: Readonly<ProfileSheetProps>) {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
+    phone: user?.phone || "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +91,7 @@ export function ProfileSheet({ children }: Readonly<ProfileSheetProps>) {
       submitData.append("firstName", formData.firstName);
       submitData.append("lastName", formData.lastName);
       submitData.append("email", formData.email);
+      submitData.append("phone", formData.phone);
 
       if (selectedFile) {
         submitData.append("profilePhoto", selectedFile);
@@ -128,6 +130,7 @@ export function ProfileSheet({ children }: Readonly<ProfileSheetProps>) {
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         email: user.email || "",
+        phone: user.phone || "",
       });
       setError(null);
       setSuccess(false);
@@ -306,6 +309,24 @@ export function ProfileSheet({ children }: Readonly<ProfileSheetProps>) {
                   required
                   className='w-full px-3 py-2 border border-[#e0d8c9] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#382f21] focus:border-transparent text-[#382f21]'
                   placeholder='Enter your email address'
+                />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label
+                  htmlFor='phone'
+                  className='block text-sm font-medium text-[#382f21] mb-2'>
+                  Phone Number
+                </label>
+                <input
+                  type='tel'
+                  id='phone'
+                  name='phone'
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className='w-full px-3 py-2 border border-[#e0d8c9] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#382f21] focus:border-transparent text-[#382f21]'
+                  placeholder='Enter your phone number'
                 />
               </div>
 

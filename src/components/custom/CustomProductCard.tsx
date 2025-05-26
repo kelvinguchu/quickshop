@@ -22,12 +22,13 @@ export default function CustomProductCard({
     product.mainImage &&
     typeof product.mainImage === "object" &&
     "url" in product.mainImage &&
-    product.mainImage.url
+    typeof product.mainImage.url === "string" &&
+    product.mainImage.url.trim() !== ""
   ) {
     imageSource = product.mainImage.url;
   }
 
-  const finalImageSource = imageSource ?? "Quick Shop";
+  const finalImageSource = imageSource ?? "/qamis/qamis1.webp";
 
   // Calculate 30% deposit
   const depositAmount = (product.price * 0.3).toFixed(2);
@@ -45,15 +46,16 @@ export default function CustomProductCard({
           fill
           sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
           className='object-cover transition-all duration-700 group-hover:scale-105'
+          onError={(e) => {
+            // Fallback to a known good image if the current one fails
+            const target = e.target as HTMLImageElement;
+            if (target.src !== "/qamis/qamis1.webp") {
+              target.src = "/qamis/qamis1.webp";
+            }
+          }}
         />
         <div className='absolute inset-0 bg-[#382f21]/0 transition-all duration-300 group-hover:bg-[#382f21]/10'></div>
       </div>
-
-      <style jsx global>{`
-        .clip-path-ribbon {
-          clip-path: polygon(0 0, 100% 0, 100% 70%, 90% 100%, 0 100%);
-        }
-      `}</style>
 
       {/* Product Info */}
       <div className='p-2 sm:p-3 border-t border-[#e0d8c9]/40'>

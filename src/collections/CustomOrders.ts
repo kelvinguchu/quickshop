@@ -14,9 +14,37 @@ const CustomOrders: CollectionConfig = {
     description: "Custom measurement orders with deposit payments",
   },
   access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
+    read: ({ req: { user } }) => {
+      if (!user) return false;
+      // Admins can read all orders
+      if (user.role === "admin") return true;
+      // Users can only read their own orders using userId for better security
+      return {
+        userId: {
+          equals: user.id,
+        },
+      };
+    },
+    create: ({ req: { user } }) => {
+      // Only authenticated users can create orders
+      return !!user;
+    },
+    update: ({ req: { user } }) => {
+      if (!user) return false;
+      // Admins can update all orders
+      if (user.role === "admin") return true;
+      // Users can only update their own orders using userId for better security
+      return {
+        userId: {
+          equals: user.id,
+        },
+      };
+    },
+    delete: ({ req: { user } }) => {
+      if (!user) return false;
+      // Only admins can delete orders
+      return user.role === "admin";
+    },
   },
   fields: [
     {
@@ -25,6 +53,20 @@ const CustomOrders: CollectionConfig = {
       required: true,
       admin: {
         description: "Unique custom order identifier",
+      },
+    },
+    {
+      name: "userId",
+      type: "text",
+      required: true,
+      admin: {
+        description: "ID of the user who created this order",
+      },
+      access: {
+        update: ({ req: { user } }) => {
+          // Only admins can update userId to prevent tampering
+          return user?.role === "admin";
+        },
       },
     },
     {
@@ -243,6 +285,16 @@ const CustomOrders: CollectionConfig = {
           admin: {
             description: "Additional payment details from provider",
           },
+          access: {
+            read: ({ req: { user } }) => {
+              // Only admins can read full payment details
+              return user?.role === "admin";
+            },
+            update: ({ req: { user } }) => {
+              // Only admins can update payment details
+              return user?.role === "admin";
+            },
+          },
         },
       ],
     },
@@ -349,6 +401,12 @@ const CustomOrders: CollectionConfig = {
           value: "cancelled",
         },
       ],
+      access: {
+        update: ({ req: { user } }) => {
+          // Only admins can update order status
+          return user?.role === "admin";
+        },
+      },
     },
     {
       name: "notes",
@@ -362,6 +420,16 @@ const CustomOrders: CollectionConfig = {
       type: "textarea",
       admin: {
         description: "Internal production notes",
+      },
+      access: {
+        read: ({ req: { user } }) => {
+          // Only admins can read production notes
+          return user?.role === "admin";
+        },
+        update: ({ req: { user } }) => {
+          // Only admins can update production notes
+          return user?.role === "admin";
+        },
       },
     },
     {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, ShoppingBag, User, Home, Grid } from "lucide-react";
+import { Search, Heart, ShoppingBag, Home, Grid } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useWishlistStore } from "@/lib/wishlist/wishlistStore";
 import { WishlistSheet } from "@/components/wishlist/WishlistSheet";
@@ -20,7 +20,7 @@ interface MobileNavProps {
   categories: CategoryUI[];
 }
 
-export default function MobileNav({ categories }: MobileNavProps) {
+export default function MobileNav({ categories }: Readonly<MobileNavProps>) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { itemCount } = useCart();
@@ -149,31 +149,31 @@ export default function MobileNav({ categories }: MobileNavProps) {
 
                   {/* Product Categories */}
                   {categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className='border-b border-[#e0d8c9] pb-4'>
-                      <Link
-                        href={`/collections/${category.slug}`}
-                        className='flex items-center justify-between mb-2 text-[#382f21] font-medium hover:text-[#d4af37] transition-colors'
-                        onClick={() => setDrawerOpen(false)}>
-                        <span>{category.name}</span>
-                      </Link>
+                      <div
+                        key={category.id}
+                        className='border-b border-[#e0d8c9] pb-4'>
+                        <Link
+                          href={`/collections/${category.slug}`}
+                          className='flex items-center justify-between mb-2 text-[#382f21] font-medium hover:text-[#d4af37] transition-colors'
+                          onClick={() => setDrawerOpen(false)}>
+                          <span>{category.name}</span>
+                        </Link>
 
-                      {category.subcategories &&
-                        category.subcategories.length > 0 && (
-                          <div className='pl-4 space-y-2'>
-                            {category.subcategories.map((subcategory) => (
-                              <Link
-                                key={subcategory.id}
-                                href={`/collections/${category.slug}/${subcategory.slug}`}
-                                className='block py-1 text-sm text-[#8a7d65] hover:text-[#d4af37] transition-colors'
-                                onClick={() => setDrawerOpen(false)}>
-                                {subcategory.name}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                    </div>
+                        {category.subcategories &&
+                          category.subcategories.length > 0 && (
+                            <div className='pl-4 space-y-2'>
+                              {category.subcategories.map((subcategory) => (
+                                <Link
+                                  key={subcategory.id}
+                                  href={`/collections/${category.slug}/${subcategory.slug}`}
+                                  className='block py-1 text-sm text-[#8a7d65] hover:text-[#d4af37] transition-colors'
+                                  onClick={() => setDrawerOpen(false)}>
+                                  {subcategory.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                      </div>
                   ))}
                 </div>
               </div>

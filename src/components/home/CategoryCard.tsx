@@ -40,7 +40,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
 
   // Final fallback to a default image
   if (!imageSource) {
-    imageSource = "/abayas/abaya1.webp"; // Default fallback
+    imageSource = "/abayas/abaya4.webp"; // Default fallback
   }
 
   // Create the link URL based on available data

@@ -1,10 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@/payload.config";
+import { validateCSRFFromRequest } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
   try {
     const payload = await getPayload({ config });
+
+    // Validate CSRF token
+    if (!validateCSRFFromRequest(request)) {
+      return NextResponse.json(
+        { error: "Invalid or missing CSRF token" },
+        { status: 403 }
+      );
+    }
+
+    // Authenticate the user
+    const { user } = await payload.auth({ headers: request.headers });
+
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
 
     // Validate required fields
@@ -29,28 +46,76 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique order number
-    const orderNumber = `CO-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+    // Validate measurements
+    const validatedMeasurements = {
+      chest: parseFloat(measurements.chest),
+      shoulder: parseFloat(measurements.shoulder),
+      sleeve: parseFloat(measurements.sleeve),
+      length: parseFloat(measurements.length),
+      waist: parseFloat(measurements.waist),
+      hip: parseFloat(measurements.hip),
+    };
+
+    // Check for NaN values
+    const measurementValues = Object.values(validatedMeasurements);
+    if (measurementValues.some((val) => isNaN(val) || val <= 0)) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid measurement values. All measurements must be positive numbers.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate amounts
+    const validatedAmounts = {
+      depositAmount: parseFloat(depositAmount),
+      remainingAmount: parseFloat(remainingAmount),
+      totalAmount: parseFloat(totalAmount),
+    };
+
+    if (Object.values(validatedAmounts).some((val) => isNaN(val) || val < 0)) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid amount values. All amounts must be non-negative numbers.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Verify amounts add up correctly
+    if (
+      Math.abs(
+        validatedAmounts.depositAmount +
+          validatedAmounts.remainingAmount -
+          validatedAmounts.totalAmount
+      ) > 0.01
+    ) {
+      return NextResponse.json(
+        { error: "Deposit and remaining amounts must equal total amount" },
+        { status: 400 }
+      );
+    }
+
+    // Generate unique order number using nanoid
+    const { nanoid } = await import("nanoid");
+    const orderNumber = `CO-${nanoid(12).toUpperCase()}`;
 
     // Create the custom order
     const customOrder = await payload.create({
       collection: "custom-orders",
       data: {
         orderNumber,
+        userId: user.id, // Store user ID for secure ownership verification
         product: {
           id: product.id,
           name: product.name,
           price: product.price,
           image: product.image,
         },
-        measurements: {
-          chest: parseFloat(measurements.chest),
-          shoulder: parseFloat(measurements.shoulder),
-          sleeve: parseFloat(measurements.sleeve),
-          length: parseFloat(measurements.length),
-          waist: parseFloat(measurements.waist),
-          hip: parseFloat(measurements.hip),
-        },
+        measurements: validatedMeasurements,
         customer: {
           firstName: customer.firstName,
           lastName: customer.lastName,
@@ -63,9 +128,9 @@ export async function POST(request: NextRequest) {
           country: shippingAddress.country,
           postalCode: shippingAddress.postalCode,
         },
-        depositAmount: parseFloat(depositAmount),
-        remainingAmount: parseFloat(remainingAmount),
-        totalAmount: parseFloat(totalAmount),
+        depositAmount: validatedAmounts.depositAmount,
+        remainingAmount: validatedAmounts.remainingAmount,
+        totalAmount: validatedAmounts.totalAmount,
         payment: {
           method: payment.method,
           transactionId: payment.transactionId,
@@ -118,8 +183,8 @@ export async function GET(request: NextRequest) {
         id: orderId,
       });
 
-      // Check if the order belongs to the authenticated user
-      if (order.customer.email !== user.email) {
+      // Check if the order belongs to the authenticated user using user ID
+      if (order.userId !== user.id) {
         return NextResponse.json({ message: "Forbidden" }, { status: 403 });
       }
 
@@ -132,8 +197,8 @@ export async function GET(request: NextRequest) {
       const orders = await payload.find({
         collection: "custom-orders",
         where: {
-          "customer.email": {
-            equals: user.email,
+          userId: {
+            equals: user.id,
           },
         },
         page,
@@ -147,15 +212,16 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching custom orders:", error);
 
-    // If it's a session error, try to return empty result instead of error
+    // If it's a session error, return proper authentication error
     if (
       error instanceof Error &&
       (error.message?.includes("session") || error.message?.includes("Session"))
     ) {
-      console.warn(
-        "Session error detected, returning empty custom orders list"
+      console.warn("Session error detected, user needs to re-authenticate");
+      return NextResponse.json(
+        { error: "Session expired. Please log in again." },
+        { status: 401 }
       );
-      return NextResponse.json({ docs: [], totalDocs: 0, limit: 50, page: 1 });
     }
 
     return NextResponse.json(

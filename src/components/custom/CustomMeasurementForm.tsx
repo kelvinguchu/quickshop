@@ -2,39 +2,57 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { ArrowLeft, Ruler, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard } from "lucide-react";
 import Link from "next/link";
-import type { Product } from "@/payload-types";
+import type { Product, User } from "@/payload-types";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useCSRF } from "@/hooks/useCSRF";
+import { ProductSummaryCard } from "./ProductSummaryCard";
+import { MeasurementsSection } from "./MeasurementsSection";
+import { CustomerInfoSection } from "./CustomerInfoSection";
+import { ShippingAddressSection } from "./ShippingAddressSection";
+import { AuthenticationPrompt } from "./AuthenticationPrompt";
+import type { MeasurementData } from "./types";
+
+// Extended User interface until types are regenerated
+interface ExtendedUser {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  savedMeasurements?: {
+    abaya?: {
+      chest?: number;
+      shoulder?: number;
+      sleeve?: number;
+      length?: number;
+      waist?: number;
+      hip?: number;
+    };
+    qamis?: {
+      chest?: number;
+      shoulder?: number;
+      sleeve?: number;
+      length?: number;
+      waist?: number;
+      hip?: number;
+    };
+  };
+  savedShippingAddress?: {
+    address?: string;
+    city?: string;
+    country?: string;
+    postalCode?: string;
+  };
+}
 
 // Declare IntaSend types
 declare global {
   interface Window {
     IntaSend: any;
   }
-}
-
-interface MeasurementData {
-  // Basic measurements
-  chest: string;
-  shoulder: string;
-  sleeve: string;
-  length: string;
-  waist: string;
-  hip: string;
-  // Customer info
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  // Shipping address
-  address: string;
-  city: string;
-  country: string;
-  postalCode: string;
-  // Additional notes
-  notes: string;
 }
 
 interface CustomMeasurementFormProps {
@@ -45,21 +63,26 @@ export default function CustomMeasurementForm({
   product,
 }: Readonly<CustomMeasurementFormProps>) {
   const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const {
     exchangeRate,
     isLoading: isExchangeLoading,
     isCached,
     cacheAge,
   } = useExchangeRate();
+  const { token: csrfToken, isLoading: isCSRFLoading } = useCSRF();
   const paymentButtonRef = useRef<HTMLDivElement>(null);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [formValid, setFormValid] = useState(false);
+  const [initialMeasurements, setInitialMeasurements] =
+    useState<MeasurementData | null>(null);
 
   // Calculate 30% deposit
   const depositAmount = product.price * 0.3;
-  const amountInKES = Math.round(depositAmount * exchangeRate); // Convert to KES using real-time rate
+  const amountInKES =
+    exchangeRate > 0 ? Math.round(depositAmount * exchangeRate * 100) / 100 : 0;
 
   // Handle image source
   let imageSource: string | undefined;
@@ -95,6 +118,53 @@ export default function CustomMeasurementForm({
     notes: "",
   });
 
+  // Get category slug from product
+  const getCategorySlug = (): string => {
+    if (typeof product.category === "string") {
+      return product.category;
+    }
+    return product.category?.slug || "abaya";
+  };
+
+  const categorySlug = getCategorySlug();
+
+  // Pre-fill user data when authenticated user is loaded
+  useEffect(() => {
+    if (user && !isAuthLoading) {
+      // Cast user to extended interface
+      const extendedUser = user as ExtendedUser;
+
+      // Get category-specific measurements
+      const categoryMeasurements =
+        extendedUser.savedMeasurements?.[categorySlug as "abaya" | "qamis"];
+
+      const newMeasurementData = {
+        ...measurementData,
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        email: user.email ?? "",
+        phone: extendedUser.phone ?? "",
+        // Pre-fill saved measurements if available for this category
+        chest: categoryMeasurements?.chest?.toString() ?? "",
+        shoulder: categoryMeasurements?.shoulder?.toString() ?? "",
+        sleeve: categoryMeasurements?.sleeve?.toString() ?? "",
+        length: categoryMeasurements?.length?.toString() ?? "",
+        waist: categoryMeasurements?.waist?.toString() ?? "",
+        hip: categoryMeasurements?.hip?.toString() ?? "",
+        // Pre-fill saved shipping address if available
+        address: extendedUser.savedShippingAddress?.address ?? "",
+        city: extendedUser.savedShippingAddress?.city ?? "",
+        country: extendedUser.savedShippingAddress?.country ?? "Kenya",
+        postalCode: extendedUser.savedShippingAddress?.postalCode ?? "",
+      };
+
+      setMeasurementData(newMeasurementData);
+
+      // Store initial measurements to detect changes later
+      setInitialMeasurements(newMeasurementData);
+    }
+  }, [user, isAuthLoading, categorySlug]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -105,6 +175,75 @@ export default function CustomMeasurementForm({
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Function to save measurements and shipping address to user profile
+  const saveMeasurementsAndShipping = async () => {
+    if (!user) return;
+
+    // Check if measurements have changed from initial values
+    const measurementsChanged =
+      initialMeasurements &&
+      (measurementData.chest !== initialMeasurements.chest ||
+        measurementData.shoulder !== initialMeasurements.shoulder ||
+        measurementData.sleeve !== initialMeasurements.sleeve ||
+        measurementData.length !== initialMeasurements.length ||
+        measurementData.waist !== initialMeasurements.waist ||
+        measurementData.hip !== initialMeasurements.hip);
+
+    // Check if shipping address has changed from initial values
+    const shippingChanged =
+      initialMeasurements &&
+      (measurementData.address !== initialMeasurements.address ||
+        measurementData.city !== initialMeasurements.city ||
+        measurementData.country !== initialMeasurements.country ||
+        measurementData.postalCode !== initialMeasurements.postalCode);
+
+    // Only save if there are changes or if it's the first time (no initial measurements)
+    if (!initialMeasurements || measurementsChanged || shippingChanged) {
+      try {
+        const requestBody: any = {
+          category: categorySlug,
+        };
+
+        // Only include measurements if they changed or it's first time
+        if (!initialMeasurements || measurementsChanged) {
+          requestBody.measurements = {
+            chest: measurementData.chest,
+            shoulder: measurementData.shoulder,
+            sleeve: measurementData.sleeve,
+            length: measurementData.length,
+            waist: measurementData.waist,
+            hip: measurementData.hip,
+          };
+        }
+
+        // Only include shipping if it changed or it's first time
+        if (!initialMeasurements || shippingChanged) {
+          requestBody.shippingAddress = {
+            address: measurementData.address,
+            city: measurementData.city,
+            country: measurementData.country,
+            postalCode: measurementData.postalCode,
+          };
+        }
+
+        const response = await fetch("/api/users/measurements", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          // Silent failure - measurements saving is not critical for order flow
+        }
+      } catch (error) {
+        // Silent failure - measurements saving is not critical for order flow
+      }
+    }
   };
 
   // Check form validity
@@ -123,7 +262,8 @@ export default function CustomMeasurementForm({
       measurementData.address.trim() !== "" &&
       measurementData.city.trim() !== "" &&
       measurementData.country.trim() !== "" &&
-      measurementData.postalCode.trim() !== "";
+      measurementData.postalCode.trim() !== "" &&
+      !!csrfToken; // Ensure CSRF token is available
 
     setFormValid(isValid);
 
@@ -135,7 +275,7 @@ export default function CustomMeasurementForm({
       payButton.style.cursor = isValid ? "pointer" : "not-allowed";
       payButton.style.opacity = isValid ? "1" : "0.7";
     }
-  }, [measurementData]);
+  }, [measurementData, csrfToken]);
 
   // Load IntaSend script
   useEffect(() => {
@@ -167,20 +307,26 @@ export default function CustomMeasurementForm({
     button.className = "intaSendPayButton";
     button.setAttribute("data-amount", amountInKES.toString());
     button.setAttribute("data-currency", "KES");
-    button.setAttribute(
-      "data-email",
-      measurementData.email || "customer@example.com"
-    );
-    button.setAttribute(
-      "data-first_name",
-      measurementData.firstName || "Customer"
-    );
-    button.setAttribute("data-last_name", measurementData.lastName || "");
-    button.setAttribute("data-phone_number", measurementData.phone);
-    button.setAttribute(
-      "data-country",
-      measurementData.country.substring(0, 2).toUpperCase()
-    );
+
+    // Only set attributes when actual values are available
+    if (measurementData.email) {
+      button.setAttribute("data-email", measurementData.email);
+    }
+    if (measurementData.firstName) {
+      button.setAttribute("data-first_name", measurementData.firstName);
+    }
+    if (measurementData.lastName) {
+      button.setAttribute("data-last_name", measurementData.lastName);
+    }
+    if (measurementData.phone) {
+      button.setAttribute("data-phone_number", measurementData.phone);
+    }
+    if (measurementData.country) {
+      button.setAttribute(
+        "data-country",
+        measurementData.country.substring(0, 2).toUpperCase()
+      );
+    }
     button.textContent = `Pay Deposit - KES ${amountInKES.toFixed(2)}`;
 
     // Style the button
@@ -213,12 +359,23 @@ export default function CustomMeasurementForm({
         setIsProcessing(true);
 
         try {
+          // Save measurements and shipping address to user profile
+          await saveMeasurementsAndShipping();
+
           // Create custom order
+          const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+          };
+
+          // Add CSRF token if available
+          if (csrfToken) {
+            headers["x-csrf-token"] = csrfToken;
+          }
+
           const response = await fetch("/api/custom-orders", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers,
+            credentials: "include", // Include authentication cookies
             body: JSON.stringify({
               product: {
                 id: product.id,
@@ -261,27 +418,35 @@ export default function CustomMeasurementForm({
           });
 
           if (!response.ok) {
+            if (response.status === 401) {
+              throw new Error(
+                "Authentication required. Please log in and try again."
+              );
+            }
+            if (response.status === 403) {
+              throw new Error(
+                "Security validation failed. Please refresh the page and try again."
+              );
+            }
             throw new Error("Failed to create custom order");
           }
 
           const order = await response.json();
           router.push(`/custom/confirmation?order=${order.id}`);
         } catch (error) {
-          console.error("Error creating custom order:", error);
           setPaymentError(
-            "Payment received but failed to create order. Please contact support."
+            "Payment received but failed to create order. Please contact support immediately with reference: " +
+              (results.transactionId ?? results.id)
           );
           setIsProcessing(false);
         }
       })
       .on("FAILED", (results: any) => {
-        console.error("Payment failed", results);
         setPaymentError(
           "Payment failed. Please try again or use a different payment method."
         );
       })
       .on("IN-PROGRESS", (results: any) => {
-        console.log("Payment in progress", results);
         setIsProcessing(true);
       });
   }, [
@@ -296,349 +461,62 @@ export default function CustomMeasurementForm({
     exchangeRate,
   ]);
 
+  // Show loading state while checking authentication or CSRF
+  if (isAuthLoading || isCSRFLoading) {
+    return (
+      <div className='space-y-6'>
+        {/* Back Button */}
+
+        <div className='flex items-center justify-center py-12'>
+          <div className='text-center'>
+            <div className='inline-block h-8 w-8 animate-spin rounded-full border-2 border-[#8a7d65] border-t-transparent mb-4'></div>
+            <p className='text-[#8a7d65]'>Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication required message if user is not logged in
+  if (!user) {
+    return <AuthenticationPrompt productId={product.id} />;
+  }
+
   return (
     <div className='space-y-6'>
       {/* Back Button */}
-      <Link
-        href='/custom'
-        className='inline-flex items-center gap-2 text-[#8a7d65] hover:text-[#382f21] transition-colors text-sm'>
-        <ArrowLeft className='h-4 w-4' />
-        Back to Products
-      </Link>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Product Info */}
         <div className='lg:col-span-1'>
-          <div className='bg-white rounded-sm border border-[#e0d8c9] p-4 sticky top-4'>
-            <div className='aspect-[4/5] w-full bg-[#f9f6f2] rounded-sm overflow-hidden mb-4'>
-              <Image
-                src={finalImageSource}
-                alt={product.name}
-                width={300}
-                height={375}
-                className='w-full h-full object-cover'
-              />
-            </div>
-            <h3 className='font-cinzel text-lg text-[#382f21] mb-2'>
-              {product.name}
-            </h3>
-            <div className='space-y-1 text-sm text-[#8a7d65]'>
-              <p>
-                Full Price:{" "}
-                <span className='font-medium'>${product.price.toFixed(2)}</span>
-              </p>
-              <p>
-                Deposit (30%):{" "}
-                <span className='font-medium text-amber-600'>
-                  ${depositAmount.toFixed(2)}
-                </span>
-              </p>
-              <p>
-                Remaining:{" "}
-                <span className='font-medium'>
-                  ${(product.price - depositAmount).toFixed(2)}
-                </span>
-              </p>
-            </div>
-          </div>
+          <ProductSummaryCard
+            product={product}
+            depositAmount={depositAmount}
+            finalImageSource={finalImageSource}
+          />
         </div>
 
         {/* Measurement Form */}
         <div className='lg:col-span-2 space-y-6'>
           {/* Measurements Section */}
-          <div className='bg-white rounded-sm border border-[#e0d8c9] p-4'>
-            <h3 className='font-cinzel text-sm md:text-lg text-[#382f21] mb-4 flex items-center gap-2'>
-              <Ruler className='h-5 w-5' />
-              Body Measurements (cm)
-            </h3>
-
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <div>
-                <label
-                  htmlFor='chest'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Chest/Bust*
-                </label>
-                <input
-                  type='number'
-                  id='chest'
-                  name='chest'
-                  value={measurementData.chest}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 96'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='shoulder'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Shoulder Width*
-                </label>
-                <input
-                  type='number'
-                  id='shoulder'
-                  name='shoulder'
-                  value={measurementData.shoulder}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 42'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='sleeve'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Sleeve Length*
-                </label>
-                <input
-                  type='number'
-                  id='sleeve'
-                  name='sleeve'
-                  value={measurementData.sleeve}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 60'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='length'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Total Length*
-                </label>
-                <input
-                  type='number'
-                  id='length'
-                  name='length'
-                  value={measurementData.length}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 140'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='waist'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Waist*
-                </label>
-                <input
-                  type='number'
-                  id='waist'
-                  name='waist'
-                  value={measurementData.waist}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 80'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='hip'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Hip*
-                </label>
-                <input
-                  type='number'
-                  id='hip'
-                  name='hip'
-                  value={measurementData.hip}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  placeholder='e.g. 100'
-                  required
-                />
-              </div>
-            </div>
-
-            <div className='mt-4'>
-              <label
-                htmlFor='notes'
-                className='block text-xs text-[#8a7d65] mb-1'>
-                Additional Notes (Optional)
-              </label>
-              <textarea
-                id='notes'
-                name='notes'
-                value={measurementData.notes}
-                onChange={handleChange}
-                rows={3}
-                className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                placeholder='Any special requirements or notes...'
-              />
-            </div>
-          </div>
+          <MeasurementsSection
+            measurementData={measurementData}
+            handleChange={handleChange}
+            product={product}
+          />
 
           {/* Customer Info Section */}
-          <div className='bg-white rounded-sm border border-[#e0d8c9] p-4'>
-            <h3 className='font-cinzel text-sm md:text-lg text-[#382f21] mb-4'>
-              Customer Information
-            </h3>
-
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <div>
-                <label
-                  htmlFor='firstName'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  First Name*
-                </label>
-                <input
-                  type='text'
-                  id='firstName'
-                  name='firstName'
-                  value={measurementData.firstName}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='lastName'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Last Name*
-                </label>
-                <input
-                  type='text'
-                  id='lastName'
-                  name='lastName'
-                  value={measurementData.lastName}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='email'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Email Address*
-                </label>
-                <input
-                  type='email'
-                  id='email'
-                  name='email'
-                  value={measurementData.email}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor='phone'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Phone Number*
-                </label>
-                <input
-                  type='tel'
-                  id='phone'
-                  name='phone'
-                  value={measurementData.phone}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  required
-                />
-              </div>
-            </div>
-          </div>
+          <CustomerInfoSection
+            measurementData={measurementData}
+            handleChange={handleChange}
+            user={user}
+          />
 
           {/* Shipping Address Section */}
-          <div className='bg-white rounded-sm border border-[#e0d8c9] p-4'>
-            <h3 className='font-cinzel text-sm md:text-lg text-[#382f21] mb-4'>
-              Shipping Address
-            </h3>
-
-            <div className='space-y-4'>
-              <div>
-                <label
-                  htmlFor='address'
-                  className='block text-xs text-[#8a7d65] mb-1'>
-                  Address*
-                </label>
-                <input
-                  type='text'
-                  id='address'
-                  name='address'
-                  value={measurementData.address}
-                  onChange={handleChange}
-                  className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                  required
-                />
-              </div>
-
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                <div>
-                  <label
-                    htmlFor='city'
-                    className='block text-xs text-[#8a7d65] mb-1'>
-                    City*
-                  </label>
-                  <input
-                    type='text'
-                    id='city'
-                    name='city'
-                    value={measurementData.city}
-                    onChange={handleChange}
-                    className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='postalCode'
-                    className='block text-xs text-[#8a7d65] mb-1'>
-                    Postal Code*
-                  </label>
-                  <input
-                    type='text'
-                    id='postalCode'
-                    name='postalCode'
-                    value={measurementData.postalCode}
-                    onChange={handleChange}
-                    className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='country'
-                    className='block text-xs text-[#8a7d65] mb-1'>
-                    Country*
-                  </label>
-                  <select
-                    id='country'
-                    name='country'
-                    value={measurementData.country}
-                    onChange={handleChange}
-                    className='w-full border border-[#e0d8c9] rounded-sm px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#8a7d65]'
-                    required>
-                    <option value='Kenya'>Kenya</option>
-                    <option value='Uganda'>Uganda</option>
-                    <option value='Tanzania'>Tanzania</option>
-                    <option value='Rwanda'>Rwanda</option>
-                    <option value='Ethiopia'>Ethiopia</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ShippingAddressSection
+            measurementData={measurementData}
+            handleChange={handleChange}
+          />
 
           {/* Payment Section */}
           <div className='bg-white rounded-sm border border-[#e0d8c9] p-4'>
@@ -702,7 +580,9 @@ export default function CustomMeasurementForm({
 
             {!formValid && (
               <p className='mt-2 text-xs text-amber-600 text-center'>
-                Please fill in all required fields to enable payment
+                {!csrfToken
+                  ? "Loading security token..."
+                  : "Please fill in all required fields to enable payment"}
               </p>
             )}
           </div>

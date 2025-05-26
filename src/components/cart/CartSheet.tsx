@@ -148,21 +148,15 @@ export function CartSheet({ children }: CartSheetProps) {
             </div>
 
             {!user && (
-              <div className='bg-blue-50 border border-blue-200 rounded-sm p-3 mb-2'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <User className='w-4 h-4 text-blue-600' />
-                  <span className='text-sm font-medium text-blue-800'>
-                    Sign in for faster checkout
-                  </span>
-                </div>
-                <p className='text-xs text-blue-700 mb-2'>
-                  Save your cart and get personalized recommendations
+              <div className='border-t border-[#e0d8c9]/40 pt-3 mb-2'>
+                <p className='text-xs text-[#8a7d65] text-center'>
+                  <Link
+                    href='/login?redirect=/checkout'
+                    className='text-[#382f21] hover:underline font-medium'>
+                    Sign in
+                  </Link>{" "}
+                  for faster checkout
                 </p>
-                <Link
-                  href='/login?redirect=/checkout'
-                  className='inline-block bg-blue-600 text-white px-3 py-1.5 rounded-sm text-xs font-medium hover:bg-blue-700 transition-colors'>
-                  Sign In
-                </Link>
               </div>
             )}
 

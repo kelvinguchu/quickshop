@@ -21,9 +21,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <div className='min-h-screen bg-[#f9f6f2] py-8'>
       <div className='max-w-md mx-auto px-4'>
         <div className='text-center mb-8'>
-          <h1 className='font-cinzel text-2xl text-[#382f21] mb-2'>
+          <h2 className='font-cinzel font-bold text-2xl md:text-3xl text-[#382f21] mb-2'>
             Welcome Back
-          </h1>
+          </h2>
           <p className='text-[#8a7d65] text-sm'>
             Sign in to your QuickShop account
           </p>
