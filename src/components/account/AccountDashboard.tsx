@@ -11,6 +11,7 @@ import { ProfileSheet } from "@/components/account/ProfileSheet";
 import { MeasurementsSheet } from "@/components/account/MeasurementsSheet";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface AccountDashboardProps {
   user: {
@@ -33,7 +34,7 @@ export function AccountDashboard({ user }: Readonly<AccountDashboardProps>) {
 
   // Get user initials and profile photo
   const initials =
-    `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
+    `${user.firstName?.charAt(0) ?? ""}${user.lastName?.charAt(0) ?? ""}`.toUpperCase();
   const profilePhotoUrl =
     user.profilePhoto &&
     typeof user.profilePhoto === "object" &&
@@ -44,9 +45,11 @@ export function AccountDashboard({ user }: Readonly<AccountDashboardProps>) {
   const handleLogout = async () => {
     try {
       await logout();
+      toast.success("Successfully signed out");
       router.push("/"); // Redirect to home page after logout
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Failed to sign out. Please try again.");
     }
   };
 

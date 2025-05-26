@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
+import { logout } from "@payloadcms/next/auth";
 import config from "@/payload.config";
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await getPayload({ config });
-
-    // Get headers for authentication
-    const headers = Object.fromEntries(request.headers.entries());
-
-    // Perform logout using Payload's auth
-    await payload.logout({
-      headers,
-    });
+    // Perform logout using Payload's auth function
+    await logout({ config });
 
     // Create response with success message
     const response = NextResponse.json(
@@ -40,4 +33,3 @@ export async function POST(request: NextRequest) {
     return response;
   }
 }
- 

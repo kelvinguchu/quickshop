@@ -1,5 +1,14 @@
 import type { CollectionConfig } from "payload";
 
+// Helper function for measurement fields
+const measurementField = (name: string, description: string) => ({
+  name,
+  type: "number" as const,
+  min: 0,
+  max: 300,
+  admin: { description },
+});
+
 export const Users: CollectionConfig = {
   slug: "users",
   admin: {
@@ -43,6 +52,15 @@ export const Users: CollectionConfig = {
     {
       name: "phone",
       type: "text",
+      validate: (value: string | null | undefined) => {
+        if (!value) return true; // Allow empty since it's optional
+        const phoneRegex =
+          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{4,6}$/;
+        if (!phoneRegex.test(value)) {
+          return "Please enter a valid phone number";
+        }
+        return true;
+      },
       admin: {
         description: "User's mobile/phone number",
       },
@@ -62,48 +80,12 @@ export const Users: CollectionConfig = {
             description: "Measurements for abaya category",
           },
           fields: [
-            {
-              name: "chest",
-              type: "number",
-              admin: {
-                description: "Chest measurement in cm",
-              },
-            },
-            {
-              name: "shoulder",
-              type: "number",
-              admin: {
-                description: "Shoulder width in cm",
-              },
-            },
-            {
-              name: "sleeve",
-              type: "number",
-              admin: {
-                description: "Sleeve length in cm",
-              },
-            },
-            {
-              name: "length",
-              type: "number",
-              admin: {
-                description: "Total length in cm",
-              },
-            },
-            {
-              name: "waist",
-              type: "number",
-              admin: {
-                description: "Waist measurement in cm",
-              },
-            },
-            {
-              name: "hip",
-              type: "number",
-              admin: {
-                description: "Hip measurement in cm",
-              },
-            },
+            measurementField("chest", "Chest measurement in cm"),
+            measurementField("shoulder", "Shoulder width in cm"),
+            measurementField("sleeve", "Sleeve length in cm"),
+            measurementField("length", "Total length in cm"),
+            measurementField("waist", "Waist measurement in cm"),
+            measurementField("hip", "Hip measurement in cm"),
           ],
         },
         {
@@ -113,48 +95,12 @@ export const Users: CollectionConfig = {
             description: "Measurements for qamis category",
           },
           fields: [
-            {
-              name: "chest",
-              type: "number",
-              admin: {
-                description: "Chest measurement in cm",
-              },
-            },
-            {
-              name: "shoulder",
-              type: "number",
-              admin: {
-                description: "Shoulder width in cm",
-              },
-            },
-            {
-              name: "sleeve",
-              type: "number",
-              admin: {
-                description: "Sleeve length in cm",
-              },
-            },
-            {
-              name: "length",
-              type: "number",
-              admin: {
-                description: "Total length in cm",
-              },
-            },
-            {
-              name: "waist",
-              type: "number",
-              admin: {
-                description: "Waist measurement in cm",
-              },
-            },
-            {
-              name: "hip",
-              type: "number",
-              admin: {
-                description: "Hip measurement in cm",
-              },
-            },
+            measurementField("chest", "Chest measurement in cm"),
+            measurementField("shoulder", "Shoulder width in cm"),
+            measurementField("sleeve", "Sleeve length in cm"),
+            measurementField("length", "Total length in cm"),
+            measurementField("waist", "Waist measurement in cm"),
+            measurementField("hip", "Hip measurement in cm"),
           ],
         },
       ],
@@ -169,6 +115,7 @@ export const Users: CollectionConfig = {
         {
           name: "address",
           type: "text",
+          maxLength: 200,
           admin: {
             description: "Street address",
           },
@@ -176,6 +123,7 @@ export const Users: CollectionConfig = {
         {
           name: "city",
           type: "text",
+          maxLength: 100,
           admin: {
             description: "City",
           },
@@ -183,6 +131,7 @@ export const Users: CollectionConfig = {
         {
           name: "country",
           type: "text",
+          maxLength: 100,
           admin: {
             description: "Country",
           },
@@ -190,6 +139,7 @@ export const Users: CollectionConfig = {
         {
           name: "postalCode",
           type: "text",
+          maxLength: 20,
           admin: {
             description: "Postal/ZIP code",
           },

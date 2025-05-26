@@ -18,7 +18,10 @@ interface ShippingData {
   postalCode: string;
 }
 
-async function validateMeasurementData(data: any, category: string): Promise<{
+async function validateMeasurementData(
+  data: any,
+  category: string
+): Promise<{
   success?: boolean;
   error?: { message: string; status: number };
   measurements?: MeasurementData;
@@ -47,10 +50,10 @@ async function validateMeasurementData(data: any, category: string): Promise<{
 
   for (const measurement of measurements) {
     const numValue = Number(measurement.value);
-    if (isNaN(numValue) || numValue <= 0 || numValue > 300) {
+    if (isNaN(numValue) || numValue < 0 || numValue > 300) {
       return {
         error: {
-          message: `Invalid ${measurement.name} measurement for ${category}. Must be a positive number between 1 and 300 cm.`,
+          message: `Invalid ${measurement.name} measurement for ${category}. Must be a number between 0 and 300 cm.`,
           status: 400,
         },
       };
@@ -130,7 +133,10 @@ export async function PATCH(request: NextRequest) {
 
     // Validate and prepare measurements if provided
     if (measurements && category) {
-      const measurementValidation = await validateMeasurementData(measurements, category);
+      const measurementValidation = await validateMeasurementData(
+        measurements,
+        category
+      );
       if (measurementValidation.error) {
         return NextResponse.json(
           { message: measurementValidation.error.message },
@@ -147,7 +153,7 @@ export async function PATCH(request: NextRequest) {
 
       // Preserve existing measurements structure
       const existingMeasurements = currentUser.savedMeasurements || {};
-      
+
       updateData.savedMeasurements = {
         ...existingMeasurements,
         [category]: measurementValidation.measurements,
@@ -175,7 +181,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: `Data saved successfully${category ? ` for ${category}` : ''}`,
+      message: `Data saved successfully${category ? ` for ${category}` : ""}`,
       user: {
         id: updatedUser.id,
         savedMeasurements: updatedUser.savedMeasurements,
