@@ -120,7 +120,7 @@ export default async function RootLayout({
             <NavigationLoadingProvider>
               <AuthSyncWrapper>
                 <Navbar categories={categories} />
-                <main className='md:pt-[76px]'>{children}</main>
+                <main className='md:pt-[84px]'>{children}</main>
                 <Footer />
               </AuthSyncWrapper>
               <Toaster />

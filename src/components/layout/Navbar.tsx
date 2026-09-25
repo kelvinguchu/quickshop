@@ -55,51 +55,49 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
       {/* Desktop Navigation */}
       <header
         className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 border-b border-[#e6ded0]/60 hidden md:block
-        ${isScrolled ? "bg-white shadow-md" : "bg-white"}`}>
+        ${isScrolled ? "bg-white/95 backdrop-blur shadow-sm" : "bg-white"}`}>
         <div className='w-full'>
           {/* Top Bar */}
-          <div className='flex justify-between items-center border-b border-[#e6ded0]/60 py-2 text-xs bg-[#382f21] px-4 text-white'>
-            <div className='flex items-center space-x-4 font-montserrat'>
+          <div className='flex justify-between items-center h-7 text-[11px] tracking-wide bg-[#382f21] px-6 text-white/80'>
+            <div className='flex items-center space-x-3 font-montserrat'>
               <a
                 href='https://instagram.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoInstagram className='h-4 w-4' />
+                <BiLogoInstagram className='h-3.5 w-3.5' />
               </a>
               <a
                 href='https://facebook.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoFacebook className='h-4 w-4' />
+                <BiLogoFacebook className='h-3.5 w-3.5' />
               </a>
               <a
                 href='https://twitter.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoTwitter className='h-4 w-4' />
+                <BiLogoTwitter className='h-3.5 w-3.5' />
               </a>
             </div>
-            <div className='flex items-center space-x-4 font-montserrat'>
+            <div className='flex items-center space-x-3 font-montserrat'>
               <span>Call: +254 700 123 456</span>
-              <span>|</span>
+              <span className='text-white/30'>|</span>
               <span>Email: info@quickshop.co.ke</span>
             </div>
           </div>
 
           {/* Main Navbar */}
-          <div className='flex items-center justify-between px-4 py-3'>
+          <div className='flex items-center justify-between h-14 px-6'>
             {/* Logo */}
             <Link href='/' className='relative z-10'>
               <div className='flex items-center'>
-                <span className='font-cinzel text-2xl font-bold text-[#382f21]'>
+                <span className='font-cinzel text-xl font-bold text-[#382f21]'>
                   QuickShop
                 </span>
-                <div className='ml-2 h-5 w-5 flex items-center justify-center'>
-                  <div className='h-2 w-2 bg-[#d4af37] rounded-full animate-pulse'></div>
-                </div>
+                <div className='ml-1.5 h-1.5 w-1.5 bg-[#d4af37] rounded-full'></div>
               </div>
             </Link>
 
@@ -111,10 +109,10 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
               {categories.map((category) => (
                   <div key={category.id} className='relative group'>
                     <button
-                      className='flex items-center px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'
+                      className='flex items-center px-3 py-2 font-montserrat text-[13px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'
                       onClick={() => toggleDropdown(category.slug)}>
                       <span>{category.name}</span>
-                      <ChevronDown className='ml-1 h-4 w-4' />
+                      <ChevronDown className='ml-1 h-3.5 w-3.5 opacity-60' />
                     </button>
 
                     <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
@@ -225,7 +223,7 @@ function NavItem({
   return (
     <Link
       href={href}
-      className='px-3 py-2 font-montserrat text-sm text-[#382f21] hover:text-[#d4af37] transition-colors'>
+      className='px-3 py-2 font-montserrat text-[13px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'>
       {label}
     </Link>
   );

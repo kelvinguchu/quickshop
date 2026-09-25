@@ -57,34 +57,36 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   // Custom button text based on category type
   const buttonText = isCustom ? "Get Custom Order" : "Explore Collection";
 
+  // The whole card is one link: a large tap target with a single, clear accessible name.
+  // `!` on text colours overrides the unlayered `a { color: currentColor }` rule in styles.css.
   return (
-    <div className='group relative overflow-hidden rounded-sm'>
-      {/* Dark overlay to ensure text visibility */}
-      <div className='absolute inset-0 bg-black/40 z-10'></div>
+    <Link
+      href={linkUrl}
+      className='group relative block h-36 overflow-hidden rounded-md bg-[#382f21] sm:h-44 md:h-[clamp(240px,48vh,400px)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4af37]'>
+      <Image
+        src={imageSource}
+        alt=''
+        fill
+        className='object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100'
+        sizes='(max-width: 768px) 100vw, 33vw'
+      />
+      <div className='absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/5' />
 
-      {/* Image */}
-      <div className='relative h-[450px] w-full overflow-hidden'>
-        <Image
-          src={imageSource}
-          alt={category.name}
-          fill
-          className='object-cover transition-transform duration-700 group-hover:scale-110'
-          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-        />
+      <div className='absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 md:p-5'>
+        <div>
+          <h3 className='font-cinzel text-xl font-semibold leading-tight text-white! md:text-2xl'>
+            {category.name}
+          </h3>
+          <span className='mt-1 block font-montserrat text-[11px] uppercase tracking-[0.2em] text-white/80!'>
+            {buttonText}
+          </span>
+        </div>
+        <span
+          aria-hidden='true'
+          className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/90 text-[#382f21]! transition-colors group-hover:bg-[#d4af37] group-hover:text-white!'>
+          <FaArrowRight className='h-3 w-3' />
+        </span>
       </div>
-
-      {/* Content - always visible */}
-      <div className='absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-6'>
-        <h3 className='font-cinzel text-2xl md:text-3xl font-semibold text-white mb-4'>
-          {category.name}
-        </h3>
-        <Link
-          href={linkUrl}
-          className='inline-flex items-center font-montserrat text-xs uppercase tracking-wider bg-white text-black border border-white px-5 py-2 hover:bg-[#d4af37] hover:border-[#d4af37] transition-colors'>
-          {buttonText}
-          <FaArrowRight className='ml-2 h-3 w-3' />
-        </Link>
-      </div>
-    </div>
+    </Link>
   );
 }

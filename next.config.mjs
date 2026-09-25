@@ -1,21 +1,23 @@
 import { withPayload } from '@payloadcms/next/withPayload'
-import withPWA from 'next-pwa'
+import withPWAInit from '@ducanh2912/next-pwa'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Your Next.js config here
 }
 
-const withPWAConfig = withPWA({
+const withPWA = withPWAInit({
   dest: 'public',
   register: true,
-  skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  importScripts: ['/worker.js'],
   fallbacks: {
     image: '/icons/icon-512x512.png',
     document: '/offline.html',
   },
+  workboxOptions: {
+    skipWaiting: true,
+    importScripts: ['/worker.js'],
+  },
 })
 
-export default withPWAConfig(withPayload(nextConfig, { devBundleServerPackages: false }))
+export default withPWA(withPayload(nextConfig, { devBundleServerPackages: false }))

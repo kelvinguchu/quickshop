@@ -222,19 +222,19 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <div className='-mt-4 md:mt-6'>
+      <div className='mt-12 md:mt-0'>
         <Hero />
       </div>
 
       {/* Categories Section */}
-      <section className='py-4 md:py-16 bg-[#f9f6f2]'>
+      <section className='py-8 md:py-12 bg-[#f9f6f2]'>
         <div className='container mx-auto px-4'>
           <SectionTitle
             title='Shop by Category'
             subtitle='Explore our collections'
           />
 
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5'>
             {categoriesToDisplay.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
@@ -252,7 +252,7 @@ export default async function HomePage() {
 
           {abayasToDisplay.length > 0 ? (
             <>
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6'>
+              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4'>
                 {abayasToDisplay.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -330,7 +330,7 @@ export default async function HomePage() {
 
           {qamisToDisplay.length > 0 ? (
             <>
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6'>
+              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4'>
                 {qamisToDisplay.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

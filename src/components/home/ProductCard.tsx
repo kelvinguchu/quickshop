@@ -164,18 +164,19 @@ export default function ProductCard({
 
   return (
     <div
-      className='group relative overflow-hidden border border-[#e0d8c9]/40 rounded-sm bg-white transition-all duration-300 hover:shadow-md hover:border-[#e0d8c9]'
+      className='group relative flex h-full flex-col overflow-hidden border border-[#e0d8c9]/40 rounded-sm bg-white transition-all duration-300 hover:shadow-md hover:border-[#e0d8c9]'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       {/* Product Image with elegant overlay on hover */}
       <Link href={`/products/${product.id}`} className='block'>
-        <div className='relative aspect-[4/5] w-full overflow-hidden bg-[#f9f6f2]'>
+        {/* 2:3 matches the product photos, so nothing is cropped or zoomed */}
+        <div className='relative aspect-[2/3] w-full overflow-hidden bg-[#f9f6f2]'>
           <Image
             src={finalImageSource}
             alt={product.name}
             fill
-            sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
-            className='object-cover transition-all duration-700 group-hover:scale-105'
+            sizes='(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw'
+            className='object-cover object-top transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none'
           />
           <div className='absolute inset-0 bg-[#382f21]/0 transition-all duration-300 group-hover:bg-[#382f21]/10'></div>
         </div>
@@ -234,8 +235,8 @@ export default function ProductCard({
       `}</style>
 
       {/* Product Info - refined typography and spacing */}
-      <div className='p-2 sm:p-3 border-t border-[#e0d8c9]/40'>
-        <h3 className='font-cinzel text-xs sm:text-sm font-medium text-[#382f21]'>
+      <div className='flex flex-1 flex-col p-2 sm:p-3 border-t border-[#e0d8c9]/40'>
+        <h3 className='font-cinzel text-xs sm:text-sm font-medium text-[#382f21] line-clamp-2'>
           <Link
             href={`/products/${product.id}`}
             className='hover:text-[#8a7d65] transition-colors'>
@@ -244,7 +245,7 @@ export default function ProductCard({
         </h3>
 
         {/* Add to Cart Button - elegant hover effect */}
-        <div className='mt-1.5 sm:mt-2'>
+        <div className='mt-auto pt-1.5 sm:pt-2'>
           {isInCart ? (
             <CartSheet>
               <button className='w-full flex items-center justify-center gap-1 sm:gap-2 bg-[#8a7d65] border border-[#8a7d65] text-white rounded-md px-2 sm:px-4 py-1 sm:py-1.5 font-montserrat text-[10px] sm:text-xs uppercase tracking-wider transition-colors'>

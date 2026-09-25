@@ -1,251 +1,195 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FaArrowRight } from 'react-icons/fa'
-import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion'
+
+const SLIDE_DURATION = 6000
+const IMAGE_FADE = 1.2
+const EASE = [0.22, 1, 0.36, 1] as const
+
+const copyVariants: Variants = {
+  hidden: {},
+  show: { transition: { delayChildren: 0.35, staggerChildren: 0.12 } },
+  exit: { opacity: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+}
+
+const itemVariants = (reduceMotion: boolean | null): Variants => ({
+  hidden: { opacity: 0, y: reduceMotion ? 0 : 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
+})
 
 const slides = [
   {
     image: '/hero/hero-thobe.jpg',
-    title: 'Elegant Qamis Collection',
-    subtitle: 'Handcrafted for the modern gentleman',
+    eyebrow: "Men's Collection",
+    title: 'Qamis, refined',
+    subtitle: 'Tailored for comfort, cut for every occasion.',
     cta: '/collections/qamis',
-    ctaText: "Shop Men's Collection",
-    position: 'left',
+    ctaText: 'Shop Qamis',
+    align: 'left',
   },
   {
     image: '/hero/hero-abaya.jpg',
-    title: 'Royal Abaya Collection',
-    subtitle: 'Timeless elegance in every design',
+    eyebrow: "Women's Collection",
+    title: 'Abayas with grace',
+    subtitle: 'Flowing silhouettes in timeless colours.',
     cta: '/collections/abaya',
-    ctaText: "Explore Women's Collection",
-    position: 'right',
+    ctaText: 'Shop Abayas',
+    align: 'right',
   },
   {
     image: '/hero/hero-all.jpg',
-    title: 'Custom Made For You',
-    subtitle: 'Bespoke designs tailored to your preferences',
+    eyebrow: 'Made to Measure',
+    title: 'Made for you',
+    subtitle: 'Share your measurements, we tailor the rest.',
     cta: '/custom',
-    ctaText: 'Get Custom Order',
-    position: 'left',
+    ctaText: 'Start a Custom Order',
+    align: 'left',
   },
-]
+] as const
 
 export default function Hero() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [current, setCurrent] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const reduceMotion = useReducedMotion()
 
-  const goToSlide = useCallback(
-    (index: number) => {
-      if (isTransitioning) return
-      setIsTransitioning(true)
-      setCurrentSlide(index)
-      setTimeout(() => setIsTransitioning(false), 1000)
-    },
-    [isTransitioning],
-  )
+  const next = useCallback(() => setCurrent((i) => (i + 1) % slides.length), [])
 
-  const nextSlide = useCallback(() => {
-    goToSlide(currentSlide === slides.length - 1 ? 0 : currentSlide + 1)
-  }, [currentSlide, goToSlide, slides.length])
-
-  const prevSlide = useCallback(() => {
-    goToSlide(currentSlide === 0 ? slides.length - 1 : currentSlide - 1)
-  }, [currentSlide, goToSlide, slides.length])
-
-  // Autoplay functionality
   useEffect(() => {
-    // Reset the timer when the slide changes
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-    }
+    if (paused || reduceMotion) return
+    const timer = setTimeout(next, SLIDE_DURATION)
+    return () => clearTimeout(timer)
+  }, [current, paused, reduceMotion, next])
 
-    timerRef.current = setTimeout(() => {
-      nextSlide()
-    }, 7000)
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-      }
-    }
-  }, [currentSlide, nextSlide])
+  const slide = slides[current]
+  const alignRight = slide.align === 'right'
 
   return (
-    <section className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[85vh] min-h-[450px] sm:min-h-[550px] md:min-h-[650px] overflow-hidden bg-[#0e0e0e]">
-      {/* Progress bar */}
-      <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-white/10">
+    <section
+      className="relative h-[calc(100svh-7rem)] md:h-[calc(100svh-84px)] min-h-[380px] overflow-hidden bg-[#1a1611]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-roledescription="carousel"
+    >
+      {/* Images: slow cross-fade with a gentle settle-in zoom */}
+      <AnimatePresence initial={false}>
         <motion.div
-          className="h-full bg-[#d4af37]"
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 7, ease: 'linear' }}
-          key={currentSlide}
-        />
-      </div>
-
-      <AnimatePresence mode="wait">
-      {/* Slides */}
-        <motion.div
-          key={currentSlide}
+          key={current}
+          className="absolute inset-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1, ease: 'easeInOut' }}
-          className="absolute inset-0"
+          transition={{ duration: IMAGE_FADE, ease: EASE }}
         >
-          {/* Gradient overlay */}
-          <div
-            className={`absolute inset-0 z-10 
-              ${
-                slides[currentSlide].position === 'left'
-                  ? 'bg-gradient-to-r from-[#0e0e0e]/90 via-[#0e0e0e]/60 to-transparent'
-                  : 'bg-gradient-to-l from-[#0e0e0e]/90 via-[#0e0e0e]/60 to-transparent'
-              }`}
-          ></div>
-
-          {/* Background image */}
           <motion.div
-            className="relative h-full w-full"
-            initial={{ scale: 1.05 }}
+            className="absolute inset-0 will-change-transform"
+            initial={{ scale: reduceMotion ? 1 : 1.06 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 7 }}
+            transition={{ duration: SLIDE_DURATION / 1000 + IMAGE_FADE, ease: 'easeOut' }}
           >
             <Image
-              src={slides[currentSlide].image}
-              alt={slides[currentSlide].title}
+              src={slide.image}
+              alt=""
               fill
-              priority={currentSlide === 0}
+              priority={current === 0}
+              sizes="100vw"
               className="object-cover object-center"
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
-              quality={90}
             />
           </motion.div>
+        </motion.div>
+      </AnimatePresence>
 
-          {/* Content */}
-          <div
-            className={`absolute inset-0 z-30 flex items-center 
-            ${slides[currentSlide].position === 'left' ? 'justify-start' : 'justify-end'}`}
-          >
-            <motion.div
-              className={`text-white max-w-xs sm:max-w-sm md:max-w-md space-y-3 sm:space-y-4 md:space-y-6 p-6 sm:p-8 md:p-10 border-l-2 border-[#d4af37]/80
-              ${slides[currentSlide].position === 'left' ? 'ml-4 sm:ml-8 md:ml-16 lg:ml-20' : 'mr-4 sm:mr-8 md:mr-16 lg:mr-20'}`}
-              initial={{
-                opacity: 0,
-                x: slides[currentSlide].position === 'left' ? -50 : 50,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              transition={{ duration: 1, delay: 0.3 }}
+      {/* Overlays stay outside the fading layer so contrast never dips mid-transition */}
+      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/10 md:hidden" />
+      <div
+        className={`absolute inset-0 hidden bg-gradient-to-r from-black/75 via-black/40 to-transparent transition-opacity duration-1000 md:block ${
+          alignRight ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+      <div
+        className={`absolute inset-0 hidden bg-gradient-to-l from-black/75 via-black/40 to-transparent transition-opacity duration-1000 md:block ${
+          alignRight ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      {/* Copy: each slide gets its own positioned layer, so the outgoing text
+          fades in place while the incoming text staggers in */}
+      <AnimatePresence>
+        <motion.div
+          key={current}
+          className={`absolute inset-0 z-10 flex items-end px-5 pb-16 md:items-center md:px-12 md:pb-0 lg:px-20 ${
+            alignRight ? 'md:justify-end' : 'md:justify-start'
+          }`}
+          variants={copyVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+        >
+          <div className="max-w-md text-[#f9f6f2] [text-shadow:0_1px_12px_rgb(0_0_0/0.35)]">
+            {/* `!` overrides the unlayered h1/p/a rules in styles.css */}
+            <motion.p
+              variants={itemVariants(reduceMotion)}
+              className="m-0! font-montserrat text-xs font-semibold uppercase tracking-[0.25em] text-[#e6c65c] md:text-[13px]"
             >
-              <motion.h1
-                className="font-cinzel text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-[#f9f6f2] tracking-wide"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.5 }}
+              {slide.eyebrow}
+            </motion.p>
+            <motion.h1
+              variants={itemVariants(reduceMotion)}
+              className="mt-3! mb-0! font-cinzel text-3xl! leading-tight! font-semibold! md:text-5xl!"
+            >
+              {slide.title}
+            </motion.h1>
+            <motion.p
+              variants={itemVariants(reduceMotion)}
+              className="mt-3! mb-0! font-cormorant text-lg italic text-[#f9f6f2] md:text-2xl"
+            >
+              {slide.subtitle}
+            </motion.p>
+            <motion.div variants={itemVariants(reduceMotion)}>
+              <Link
+                href={slide.cta}
+                className="group mt-6 inline-flex items-center gap-2 rounded-full bg-[#f9f6f2] px-6 py-3 font-montserrat text-sm font-medium uppercase tracking-widest text-[#382f21]! [text-shadow:none] transition-colors hover:bg-[#d4af37] hover:text-white!"
               >
-                {slides[currentSlide].title}
-              </motion.h1>
-
-              <motion.p
-                className="font-cormorant text-lg sm:text-xl md:text-2xl text-[#f9f6f2]/90 italic"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.7 }}
-              >
-                {slides[currentSlide].subtitle}
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.9 }}
-              >
-                <Link
-                  href={slides[currentSlide].cta}
-                  className="group inline-flex items-center font-montserrat text-xs sm:text-sm uppercase tracking-widest bg-transparent border-b border-[#d4af37] text-[#f9f6f2] px-0 py-2 transition-all duration-300 relative overflow-hidden hover:border-[#f9f6f2]"
-                >
-                  <span className="relative z-10 flex items-center transition-transform duration-300 group-hover:translate-x-1">
-                    {slides[currentSlide].ctaText}
-                    <FaArrowRight className="ml-2 sm:ml-3 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
+                {slide.ctaText}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-              </motion.div>
             </motion.div>
           </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation controls */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 flex items-center">
-      <button
-        onClick={prevSlide}
-          className="mx-2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/40 transition-all duration-300 backdrop-blur-sm"
-        aria-label="Previous slide"
-        disabled={isTransitioning}
-      >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-5 h-5"
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-      </button>
-
-        <div className="flex space-x-2 sm:space-x-3">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            disabled={isTransitioning}
-              className="relative h-3 w-3"
-              aria-label={`Go to slide ${index + 1}`}
+      {/* Slide indicators */}
+      <div className="absolute bottom-5 left-5 right-5 z-10 md:bottom-8 md:left-12 md:right-auto lg:left-20">
+        <div className="flex gap-1.5 md:w-32">
+          {slides.map((s, index) => (
+            <button
+              key={s.image}
+              onClick={() => setCurrent(index)}
+              className="relative h-6 flex-1"
+              aria-label={`Go to slide ${index + 1}: ${s.title}`}
+              aria-current={index === current}
             >
-              <span
-                className={`absolute inset-0 rounded-full transition-all duration-300 ${
-              currentSlide === index
-                    ? 'bg-[#d4af37] scale-100'
-                    : 'bg-white/50 scale-75 hover:scale-90 hover:bg-white/70'
-                }`}
-              ></span>
+              <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/30">
+                {index === current && (
+                  <motion.span
+                    key={`${current}-${paused}`}
+                    className="absolute inset-y-0 left-0 bg-[#d4af37]"
+                    initial={{ width: paused || reduceMotion ? '100%' : '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{
+                      duration: paused || reduceMotion ? 0 : SLIDE_DURATION / 1000,
+                      ease: 'linear',
+                    }}
+                  />
+                )}
+              </span>
             </button>
           ))}
         </div>
-
-        <button
-          onClick={nextSlide}
-          className="mx-2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/40 transition-all duration-300 backdrop-blur-sm"
-          aria-label="Next slide"
-          disabled={isTransitioning}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-5 h-5"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </button>
       </div>
     </section>
   )

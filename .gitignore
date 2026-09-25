@@ -49,3 +49,4 @@ aboutapp.md
 /public/sw.js
 /public/worker-*.js
 /public/fallback-*.js
+/public/swe-worker-*.js
