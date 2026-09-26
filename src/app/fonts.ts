@@ -1,32 +1,28 @@
-import { Playfair_Display, Cormorant, Cinzel, Montserrat } from 'next/font/google'
+import localFont from 'next/font/local'
 
-// Elegant serif font for headings
-export const playfair = Playfair_Display({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-playfair',
-})
+// Self-hosted (latin, variable weight) so builds don't depend on fetching from
+// Google Fonts, which intermittently breaks `next build` on Vercel.
 
 // Elegant serif font for luxury feel
-export const cormorant = Cormorant({
-  subsets: ['latin'],
+export const cormorant = localFont({
+  src: './font-files/cormorant-latin.woff2',
+  weight: '300 700',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-cormorant',
 })
 
 // Royal display font for special headings
-export const cinzel = Cinzel({
-  subsets: ['latin'],
+export const cinzel = localFont({
+  src: './font-files/cinzel-latin.woff2',
+  weight: '400 900',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-cinzel',
 })
 
 // Clean sans-serif font for body text
-export const montserrat = Montserrat({
-  subsets: ['latin'],
+export const montserrat = localFont({
+  src: './font-files/montserrat-latin.woff2',
+  weight: '100 900',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-montserrat',
 })
