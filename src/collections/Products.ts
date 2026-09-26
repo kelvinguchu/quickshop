@@ -1,7 +1,12 @@
 import type { CollectionConfig } from "payload";
+import { revalidateCatalogAfterChange, revalidateCatalogAfterDelete } from "@/hooks/revalidateCatalog";
 
 export const Products: CollectionConfig = {
   slug: "products",
+  hooks: {
+    afterChange: [revalidateCatalogAfterChange],
+    afterDelete: [revalidateCatalogAfterDelete],
+  },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "category", "price", "status"],

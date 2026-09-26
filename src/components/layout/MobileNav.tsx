@@ -212,8 +212,8 @@ export default function MobileNav({ categories }: Readonly<MobileNavProps>) {
         </div>
       </div>
 
-      {/* Adjusted padding height slightly for larger icons */}
-      <div className='md:hidden h-[52px]'></div>
+      {/* Spacer for the fixed header above; same unit (h-12) so it always matches */}
+      <div className='md:hidden h-12'></div>
     </>
   );
 }

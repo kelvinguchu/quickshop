@@ -58,28 +58,28 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
         ${isScrolled ? "bg-white/95 backdrop-blur shadow-sm" : "bg-white"}`}>
         <div className='w-full'>
           {/* Top Bar */}
-          <div className='flex justify-between items-center h-7 text-[11px] tracking-wide bg-[#382f21] px-6 text-white/80'>
+          <div className='flex justify-between items-center h-7 text-xs lg:text-[13px] tracking-wide bg-[#382f21] px-6 text-white/85'>
             <div className='flex items-center space-x-3 font-montserrat'>
               <a
                 href='https://instagram.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoInstagram className='h-3.5 w-3.5' />
+                <BiLogoInstagram className='h-4 w-4' />
               </a>
               <a
                 href='https://facebook.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoFacebook className='h-3.5 w-3.5' />
+                <BiLogoFacebook className='h-4 w-4' />
               </a>
               <a
                 href='https://twitter.com'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='hover:text-[#d4af37] transition-colors'>
-                <BiLogoTwitter className='h-3.5 w-3.5' />
+                <BiLogoTwitter className='h-4 w-4' />
               </a>
             </div>
             <div className='flex items-center space-x-3 font-montserrat'>
@@ -94,10 +94,10 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
             {/* Logo */}
             <Link href='/' className='relative z-10'>
               <div className='flex items-center'>
-                <span className='font-cinzel text-xl font-bold text-[#382f21]'>
+                <span className='font-cinzel text-2xl font-bold text-[#382f21]'>
                   QuickShop
                 </span>
-                <div className='ml-1.5 h-1.5 w-1.5 bg-[#d4af37] rounded-full'></div>
+                <div className='ml-1.5 h-2 w-2 bg-[#d4af37] rounded-full'></div>
               </div>
             </Link>
 
@@ -109,10 +109,10 @@ export default function Navbar({ categories }: Readonly<NavbarProps>) {
               {categories.map((category) => (
                   <div key={category.id} className='relative group'>
                     <button
-                      className='flex items-center px-3 py-2 font-montserrat text-[13px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'
+                      className='flex items-center px-3 py-2 font-montserrat text-sm lg:text-[15px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'
                       onClick={() => toggleDropdown(category.slug)}>
                       <span>{category.name}</span>
-                      <ChevronDown className='ml-1 h-3.5 w-3.5 opacity-60' />
+                      <ChevronDown className='ml-1 h-4 w-4 opacity-60' />
                     </button>
 
                     <div className='absolute left-0 top-full w-48 bg-white shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
@@ -223,7 +223,7 @@ function NavItem({
   return (
     <Link
       href={href}
-      className='px-3 py-2 font-montserrat text-[13px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'>
+      className='px-3 py-2 font-montserrat text-sm lg:text-[15px] tracking-wide text-[#382f21] hover:text-[#d4af37] transition-colors'>
       {label}
     </Link>
   );

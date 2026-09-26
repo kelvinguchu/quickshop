@@ -24,6 +24,7 @@ const itemVariants = (reduceMotion: boolean | null): Variants => ({
 const slides = [
   {
     image: '/hero/hero-thobe.jpg',
+    focus: '72% 40%',
     eyebrow: "Men's Collection",
     title: 'Qamis, refined',
     subtitle: 'Tailored for comfort, cut for every occasion.',
@@ -33,6 +34,7 @@ const slides = [
   },
   {
     image: '/hero/hero-abaya.jpg',
+    focus: '30% 50%',
     eyebrow: "Women's Collection",
     title: 'Abayas with grace',
     subtitle: 'Flowing silhouettes in timeless colours.',
@@ -42,6 +44,7 @@ const slides = [
   },
   {
     image: '/hero/hero-all.jpg',
+    focus: '55% 35%',
     eyebrow: 'Made to Measure',
     title: 'Made for you',
     subtitle: 'Share your measurements, we tailor the rest.',
@@ -69,7 +72,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative h-[calc(100svh-7rem)] md:h-[calc(100svh-84px)] min-h-[380px] overflow-hidden bg-[#1a1611]"
+      className="relative h-[68svh] min-h-[420px] max-h-[600px] md:h-[calc(100svh-84px)] md:min-h-[380px] md:max-h-none overflow-hidden bg-[#1a1611]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -96,7 +99,8 @@ export default function Hero() {
               fill
               priority={current === 0}
               sizes="100vw"
-              className="object-cover object-center"
+              className="object-cover"
+              style={{ objectPosition: slide.focus }}
             />
           </motion.div>
         </motion.div>

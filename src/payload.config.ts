@@ -64,7 +64,9 @@ export default buildConfig({
     vercelBlobStorage({
       collections: {
         // key must match the slug in ./collections/Media
-        media: true,
+        // Media is publicly readable, so serve files straight from the Blob CDN
+        // instead of proxying every image through a Payload serverless function.
+        media: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN,
       // Uncomment if you need to upload files larger than 4.5 MB directly from the client

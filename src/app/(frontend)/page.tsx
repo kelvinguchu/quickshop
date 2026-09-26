@@ -222,9 +222,7 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <div className='mt-12 md:mt-0'>
-        <Hero />
-      </div>
+      <Hero />
 
       {/* Categories Section */}
       <section className='py-8 md:py-12 bg-[#f9f6f2]'>

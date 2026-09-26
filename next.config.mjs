@@ -3,7 +3,10 @@ import withPWAInit from '@ducanh2912/next-pwa'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your Next.js config here
+  images: {
+    // Product media is served directly from Vercel Blob
+    remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
+  },
 }
 
 const withPWA = withPWAInit({
